@@ -52,7 +52,7 @@ class MainPage extends Component {
             this.setState({ querized: true });
         }
         //
-        await this.fetchPoaps(1).then(results => {
+        await this.fetchPoaps(0).then(results => {
             if (this.state.PoapCount == poapCount) {
                 this.setState({ Poaps: results });
             }
@@ -164,14 +164,14 @@ class MainPage extends Component {
                 </Row>
                 <br></br>
                 <Row>
-                    <>
+                    {/* <>
                         <Placeholder as="p" animation="glow">
                             <Placeholder xs={12} bg="warning" />
                         </Placeholder>
                         <Placeholder as="p" animation="wave">
                             <Placeholder xs={12} bg="warning" />
                         </Placeholder>
-                    </>
+                    </> */}
                     <Row xs={1} md={5} className="g-4">
                         {this.state.Poaps.map((POAP, index) => (
                             <POAPCard POAP={POAP} index={index} checked={this.checked} />
