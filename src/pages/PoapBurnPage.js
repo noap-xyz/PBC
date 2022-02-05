@@ -1,6 +1,6 @@
 import logo from '../logo.svg';
 import '../App.css';
-import {Row, Col,Alert} from 'react-bootstrap';
+import { Row, Col, Alert } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import CardDeck from 'react-bootstrap/CardDeck';
 import React, { Component, useState } from "react";
@@ -23,77 +23,82 @@ class PoapBurnPage extends Component {
       PoapsToBurn: [],
       pageCount: 0,
       querized: false,
-      noInPage: 10
+      noInPage: 10,
+      countAllert:false
     };
   }
   componentDidMount() {
-    setInterval(async () => {
-      const accounts = await window.ethereum.enable();
-      const account = accounts[0];
-      this.setState({ connectedAddress: account });
-    }, 1000)
+
   }
   fetchData = async (t) => {
     t.preventDefault();
+    console.log('fetchData');
+    console.log(window.ethereum);
+    const accounts = await window.ethereum.enable();
+    const account = accounts[0];
+    this.setState({ selectedAccoutnt: account });
+
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x64' }], // chainId must be in hexadecimal numbers
+    });
     var gasAmount = await poapcontract.methods.balanceOf("0x90371fc9837c44d3fe17a9be68696fde51fcc011").estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
-    console.log('gasAmount');
-    console.log(gasAmount);
+
     var poapCount = await poapcontract.methods.balanceOf("0x90371fc9837c44d3fe17a9be68696fde51fcc011").call({
       from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
       gasAmount,
     });
 
-    console.log('poapCount');
-    console.log(poapCount);
-    this.setState({ pageCount: poapCount / this.state.noInPage });
-    if (this.state.pageCount > 1) {
+    //console.log('poapCount');
+    //console.log(poapCount);
+    this.setState({ pageCount: (poapCount / this.state.noInPage) + 1 });
+    if (this.state.pageCount >= 1) {
       this.setState({ querized: true });
     }
     //
     await this.fetchPoaps(0).then(results => {
-      if (this.state.PoapCount == poapCount) {
-        this.setState({ Poaps: results });
-      }
+      this.setState({ poapCount: results.length });
+      this.setState({ renderCards: true });
+      this.setState({ Poaps: results });
     });
   }
   fetchPoaps = async (pageCount) => {
     //t.preventDefault();
     var results = [];
     for (var i = this.state.noInPage * pageCount; i < this.state.noInPage * pageCount + this.state.noInPage; i++) {
+
       var gasAmount = await poapcontract.methods.tokenDetailsOfOwnerByIndex("0x90371fc9837c44d3fe17a9be68696fde51fcc011", i).estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
       var Poap = await poapcontract.methods.tokenDetailsOfOwnerByIndex("0x90371fc9837c44d3fe17a9be68696fde51fcc011", i).call({
         from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
         gasAmount,
       });
-      //console.log('Poap');
-      //console.log(Poap);
-      gasAmount = await poapcontract.methods.tokenURI(Poap.tokenId).estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
-      var PoapURI = await poapcontract.methods.tokenURI(Poap.tokenId).call({
-        from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
-        gasAmount,
+      await this.fetchPoapsURI(Poap.tokenId).then(result => {
+        fetch(result).then(res => res.json()).then(
+          result => {
+            //console.log(result);
+            var resObj = result;
+            resObj.tokenId = Poap.tokenId;
+            results.push(resObj);
+            console.log("resObj");
+            console.log(resObj);
+          }
+        )
       });
-      //console.log('PoapURI');
-      //console.log(PoapURI);
 
-      fetch(PoapURI).then(res => res.json()).then(
-        result => {
-          //console.log(result);
-          var resObj = result;
-          resObj.tokenId = Poap.tokenId;
-          results.push(resObj);
-        }
-      )
-      //this.state.Poaps.push(Poap);
     }
 
-    this.setState({ Poaps: results });
-    console.log("this.state.Poaps");
-    console.log(this.state.Poaps);
-    this.setState({ poapCount: results.length });
-    //this.setState({ Poaps: result});
-    this.setState({ renderCards: true });
+
+
     return results;
   };
+  fetchPoapsURI = async (tokenId) => {
+    var gasAmount = await poapcontract.methods.tokenURI(tokenId).estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
+    var PoapURI = await poapcontract.methods.tokenURI(tokenId).call({
+      from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
+      gasAmount,
+    });
+    return PoapURI;
+  }
 
   burn = async (t) => {
     t.preventDefault();
@@ -105,11 +110,17 @@ class PoapBurnPage extends Component {
   }
 
   checked = async (t, tokenId, checked) => {
-
     if (checked) {
-      this.state.PoapsToBurn.push(tokenId);
+      console.log("checked");
+      console.log(this.state.PoapsToBurn.length);
+      if (this.state.PoapsToBurn.length == 5) { this.setState({countAllert:true}); return false;}
+      else {
+        this.state.PoapsToBurn.push(tokenId);
+        return true;
+      }
     }
     else {
+      console.log("unchecked");
       const index = this.state.PoapsToBurn.indexOf(tokenId);
       if (index > -1) {
         this.state.PoapsToBurn.splice(index, 1); // 2nd parameter means remove one item only }
@@ -118,21 +129,26 @@ class PoapBurnPage extends Component {
     }
     console.log("this.state.PoapsToBurn");
     console.log(this.state.PoapsToBurn);
+    return true;
   }
 
   changePage = async (e) => {
-    console.log('pagination');
+    //console.log('pagination');
     const clickValue = e.target.offsetParent.getAttribute('data-page')
       ? e.target.offsetParent.getAttribute('data-page')
       : e.target.getAttribute('data-page');
-    console.log(clickValue);
+    //console.log(clickValue);
     this.fetchPoaps(clickValue - 1);
   }
+  setShow = async (e) => {
+    this.setState({countAllert:false});
+  }
+
   render() {
     let poapCards;
     if (this.state.renderCards) {
       poapCards = this.state.Poaps.map((POAP, index) => {
-        return (<div class="col-xl-3 col-lg-6">
+        return (<div className="col-xl-3 col-lg-6">
           <POAPCard POAP={POAP} index={index} checked={this.checked} />
         </div>)
 
@@ -149,8 +165,13 @@ class PoapBurnPage extends Component {
     }
     return (
       <div>
-
-        <div class="jumbotron">
+        {this.state.countAllert && <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
+          <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+          <p>
+            Too Many Poaps
+        </p>
+        </Alert>}
+        <div className="jumbotron">
           <h2> Burn!  </h2>
         </div>
         <Row>
@@ -160,28 +181,28 @@ class PoapBurnPage extends Component {
         </Row>
         <Row>
           <Col xs={12}>
-
             <Alert variant={this.state.connectedAddressStatus}>{this.state.connectedAddress}</Alert>
           </Col>
         </Row>
 
         <Button variant="secondary btn-block" onClick={this.fetchData}>Show 💩s</Button> {'   '}
 
-        <div class="form-row">
-          <CardDeck tyle={{ display: 'flex', flexDirection: 'row' }}>
+        <div className="form-row">
+          <CardDeck style={{ display: 'flex', flexDirection: 'row' }}>
             {poapCards}
           </CardDeck >
         </div>
         <br />
-        <div class="form-row">
+        <div className="form-row">
           {this.state.querized && <Pagination size="sm" onClick={this.changePage}>{items}</Pagination>}
         </div>
         <br />
         <br></br>
 
         <Row>
-
-          <Button variant="success btn-block" onClick={this.burn}>burn 💩s and mint</Button>
+          <Col xs={12}>
+            <Button variant="success btn-block" onClick={this.burn}>burn 💩s and mint</Button>
+          </Col>
 
         </Row>
       </div>

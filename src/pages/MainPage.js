@@ -14,18 +14,7 @@ class MainPage extends Component {
             AdminUser: false,
             selectedAccoutnt: "0x0000000000000000000000000000000000000000"
         };
-        this.setUp();
-    }
-    componentDidMount() {
-        setInterval(async () => {
-          const accounts = await window.ethereum.enable();
-          const account = accounts[0];
-          this.setState({ selectedAccoutnt: account });
-        }, 1000)
-      }
-      setUp = async () => {
-        const accounts = await window.ethereum.enable();
-        const account = accounts[0];
+        
     }
 
 
@@ -33,9 +22,8 @@ class MainPage extends Component {
         return (
             <div>
                 <div class="jumbotron">
-                    <h2> Asset Donation  </h2>
+                    <h2> Poap Burn </h2>
                 </div>
-                <h7>  MM Account: {this.state.selectedAccoutnt}  </h7>
                 <div class="container">
                     <div class="row top-buffer">
                         <Col xs={6}>
