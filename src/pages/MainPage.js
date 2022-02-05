@@ -21,9 +21,7 @@ class MainPage extends Component {
     render() {
         return (
             <div>
-                <div class="jumbotron">
-                    <h2> Poap Burn </h2>
-                </div>
+
                 <div class="container">
                     <div class="row top-buffer">
                         <Col xs={6}>

@@ -1,6 +1,6 @@
 import logo from '../logo.svg';
 import '../App.css';
-import { Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col, Alert,Modal } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import CardDeck from 'react-bootstrap/CardDeck';
 import React, { Component, useState } from "react";
@@ -24,7 +24,7 @@ class PoapBurnPage extends Component {
       pageCount: 0,
       querized: false,
       noInPage: 10,
-      countAllert:false
+      countAllert: false
     };
   }
   componentDidMount() {
@@ -36,7 +36,7 @@ class PoapBurnPage extends Component {
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
     const account = accounts[0];
-    this.setState({ selectedAccoutnt: account });
+    this.setState({ connectedAddressStatus: "primary", connectedAddress: account });
 
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
@@ -113,7 +113,7 @@ class PoapBurnPage extends Component {
     if (checked) {
       console.log("checked");
       console.log(this.state.PoapsToBurn.length);
-      if (this.state.PoapsToBurn.length == 5) { this.setState({countAllert:true}); return false;}
+      if (this.state.PoapsToBurn.length == 5) { this.setState({ countAllert: true }); return false; }
       else {
         this.state.PoapsToBurn.push(tokenId);
         return true;
@@ -141,7 +141,7 @@ class PoapBurnPage extends Component {
     this.fetchPoaps(clickValue - 1);
   }
   setShow = async (e) => {
-    this.setState({countAllert:false});
+    this.setState({ countAllert: false });
   }
 
   render() {
@@ -165,15 +165,6 @@ class PoapBurnPage extends Component {
     }
     return (
       <div>
-        {this.state.countAllert && <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
-          <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-          <p>
-            Too Many Poaps
-        </p>
-        </Alert>}
-        <div className="jumbotron">
-          <h2> Burn!  </h2>
-        </div>
         <Row>
           <Col xs={12}>
             <h2> 💩 🔥 </h2>
@@ -198,7 +189,19 @@ class PoapBurnPage extends Component {
         </div>
         <br />
         <br></br>
+        <Modal show={this.state.countAllert} onHide={this.handleClose}>
 
+          <Modal.Body><div class="card shadow mb-4">
+            <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
+              <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+              <p>
+                Too Many Poaps
+        </p>
+            </Alert>
+          </div>
+          </Modal.Body>
+
+        </Modal>
         <Row>
           <Col xs={12}>
             <Button variant="success btn-block" onClick={this.burn}>burn 💩s and mint</Button>
