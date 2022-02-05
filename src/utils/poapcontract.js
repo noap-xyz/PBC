@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import { PoapContractABI } from "../ABI/PoapContractABI";
+import { PoapContractABI } from "../abi/PoapContractABI";
 
 const OPTIONS = {
   defaultBlock: "latest",

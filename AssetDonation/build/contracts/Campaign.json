@@ -1,0 +1,106 @@
+{
+  "contractName": "Campaign",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.2+commit.bacdbe57\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/fatemeh/Desktop/Consensys Course/assetdonation/AssetDonation/contracts/Campaign.sol\":\"Campaign\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"/home/fatemeh/Desktop/Consensys Course/assetdonation/AssetDonation/contracts/Campaign.sol\":{\"keccak256\":\"0x5fa8ea594fde44d73abdd9b20bc3e5eabc7c3b1d0ca14634cfa022728b5e52c5\",\"urls\":[\"bzz-raw://51e6315398ad95bee7d022f686f5f637295217b6c67b1e0f0bda3efccb4fcdbd\",\"dweb:/ipfs/QmRyKKzsgHNrbFgNXwH6hf1G6eUwkrjk6BCGkbi7Hza9QL\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220f375cd6d208d40ad0c2b75974d93d0d20c16ee87ee18df4fa5f3ba151905877e64736f6c63430006020033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220f375cd6d208d40ad0c2b75974d93d0d20c16ee87ee18df4fa5f3ba151905877e64736f6c63430006020033",
+  "sourceMap": "24:21:1:-:0;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;24:21:1;;;;;;;",
+  "deployedSourceMap": "24:21:1:-:0;;;;;",
+  "source": "pragma solidity ^0.6.2;\ncontract Campaign{\n\n}",
+  "sourcePath": "/home/fatemeh/Desktop/Consensys Course/assetdonation/AssetDonation/contracts/Campaign.sol",
+  "ast": {
+    "absolutePath": "/home/fatemeh/Desktop/Consensys Course/assetdonation/AssetDonation/contracts/Campaign.sol",
+    "exportedSymbols": {
+      "Campaign": [
+        202
+      ]
+    },
+    "id": 203,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 201,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 202,
+        "linearizedBaseContracts": [
+          202
+        ],
+        "name": "Campaign",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 203,
+        "src": "24:21:1"
+      }
+    ],
+    "src": "0:45:1"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/fatemeh/Desktop/Consensys Course/assetdonation/AssetDonation/contracts/Campaign.sol",
+    "exportedSymbols": {
+      "Campaign": [
+        202
+      ]
+    },
+    "id": 203,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 201,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".2"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:1"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 202,
+        "linearizedBaseContracts": [
+          202
+        ],
+        "name": "Campaign",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 203,
+        "src": "24:21:1"
+      }
+    ],
+    "src": "0:45:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.1",
+  "updatedAt": "2020-12-08T04:29:08.665Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
