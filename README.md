@@ -22,4 +22,5 @@ yarn start
 
 - Responsive on mobile
 - make the whole card selectable (tap to select the checkbox)
-- 
+- Text for homepage (story with links?) --> maybe link to About me page, or remove About from header.
+

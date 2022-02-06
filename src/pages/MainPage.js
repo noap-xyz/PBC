@@ -25,10 +25,16 @@ class MainPage extends Component {
                 <div class="container">
                     <div class="row top-buffer">
                         <Col xs={6}>
+                            
                             <div class="row top-buffer">
-                                <div class="col-xl-6">
-                                    <Button variant="secondary btn-block" onClick={() => history.push('/PoapBurnPage')} size={20}>POⒶP🔥🎉</Button>
+
+                                <div class="col-xl-8">
+                                    <Button  onClick={() => history.push('/PoapBurnPage')} >POⒶP🔥🎉</Button>
                                 </div>
+
+                            </div>
+                            <div class="row top-buffer text-left">
+                                    SOME TEXT GOES HERE! NEEDS TO LOOK NICER!
                             </div>
                         </Col>
                         <Col xs={6}>
@@ -42,7 +48,10 @@ class MainPage extends Component {
                                             <div class="col-12">
                                                 <div class="card">
                                                     <div class="card-body">
-                                                        <Image src={icon} thumbnail />
+                                                        <Image src='./POAP.PNG' thumbnail />
+                                                        <div class="card-text">
+                                                        <a href="https://twitter.com/shiryakhat/status/1484547277142245382" target="_blank">23196</a> - Shir ya Khat Astronauts <a href="https://twitter.com/shiryakhat/status/1485326873471209475" target="_blank">🙅‍♂️</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

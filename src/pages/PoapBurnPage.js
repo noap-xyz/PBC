@@ -194,9 +194,9 @@ class PoapBurnPage extends Component {
 
           <Modal.Body><div class="card shadow mb-4">
             <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
-              <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+              <Alert.Heading>Less 🔥, more ❤️‍🔥</Alert.Heading>
               <p>
-                Too Many Poaps
+                Keep some POⒶPs, they used to be good peeps.
         </p>
             </Alert>
           </div>
