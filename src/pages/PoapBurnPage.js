@@ -1,6 +1,6 @@
 import logo from '../logo.svg';
 import '../App.css';
-import { Row, Col, Alert,Modal } from 'react-bootstrap';
+import { Row, Col, Alert, Modal } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import CardDeck from 'react-bootstrap/CardDeck';
 import React, { Component, useState } from "react";
@@ -31,13 +31,13 @@ class PoapBurnPage extends Component {
   componentDidMount() {
 
   }
-  
+
   fetchData = async (t) => {
-    t.preventDefault();
+    //t.preventDefault();
     console.log('fetchData');
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
-    this.account = accounts[0]; // TESTING: use = "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+    this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011";//accounts[0]; // TESTING: use = "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
     this.setState({ connectedAddressStatus: "primary", connectedAddress: this.account });
 
     await window.ethereum.request({
@@ -51,48 +51,57 @@ class PoapBurnPage extends Component {
       gasAmount,
     });
 
-    //console.log('poapCount');
-    //console.log(poapCount);
+    console.log('poapCount');
+    console.log(poapCount);
     this.setState({ pageCount: (poapCount / this.state.noInPage) + 1 });
-    if (this.state.pageCount >= 1) {
-      this.setState({ querized: true });
-    }
+    this.setState({ poapCount: poapCount });
+    //if (this.state.pageCount >= 1) {
+    //  this.setState({ querized: true });
+    //}
     //
-    await this.fetchPoaps(0).then(results => {
-      this.setState({ poapCount: results.length });
+
+    await this.fetchPoaps(0);
+
+    this.setState({ renderCards: true });
+
+    for (var i = 1; i < this.state.pageCount; i++) {
+      await this.fetchPoaps(i);
       this.setState({ renderCards: true });
-      this.setState({ Poaps: results });
-    });
+    }
   }
+
   fetchPoaps = async (pageCount) => {
     //t.preventDefault();
-    var results = [];
-    for (var i = this.state.noInPage * pageCount; i < this.state.noInPage * pageCount + this.state.noInPage; i++) {
+    //var results = [];
+    var currMAx = (this.state.noInPage * pageCount) + this.state.noInPage;
+    var max = currMAx < this.state.poapCount ? currMAx : this.state.poapCount;
 
-      var gasAmount = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).estimateGas({ from: this.account });
-      var Poap = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).call({
-        from: this.account,
-        gasAmount,
-      });
-      await this.fetchPoapsURI(Poap.tokenId).then(result => {
-        fetch(result).then(res => res.json()).then(
-          result => {
-            //console.log(result);
-            var resObj = result;
-            resObj.tokenId = Poap.tokenId;
-            results.push(resObj);
-            console.log("resObj");
-            console.log(resObj);
-          }
-        )
-      });
+    for (var i = this.state.noInPage * pageCount; i < max; i++) {
+      var Poap = await this.fetchPoap(i);
+      var result = await this.fetchPoapsURI(Poap.tokenId);
+      await fetch(result).then(res => res.json()).then(
+        result => {
+          console.log(i);
+          var resObj = result;
+          resObj.tokenId = Poap.tokenId;
+          this.state.Poaps.push(resObj);
+          //console.log("resObj");
+          //console.log(resObj);
+        }
+      )
 
     }
 
-
-
-    return results;
   };
+
+  fetchPoap = async (i) => {
+    var gasAmount = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).estimateGas({ from: this.account });
+    var Poap = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).call({
+      from: this.account,
+      gasAmount,
+    });
+    return Poap;
+  }
   fetchPoapsURI = async (tokenId) => {
     var gasAmount = await poapcontract.methods.tokenURI(tokenId).estimateGas({ from: this.account });
     var PoapURI = await poapcontract.methods.tokenURI(tokenId).call({
@@ -134,14 +143,14 @@ class PoapBurnPage extends Component {
     return true;
   }
 
-  changePage = async (e) => {
-    //console.log('pagination');
-    const clickValue = e.target.offsetParent.getAttribute('data-page')
-      ? e.target.offsetParent.getAttribute('data-page')
-      : e.target.getAttribute('data-page');
-    //console.log(clickValue);
-    this.fetchPoaps(clickValue - 1);
-  }
+  // changePage = async (e) => {
+  //   //console.log('pagination');
+  //   const clickValue = e.target.offsetParent.getAttribute('data-page')
+  //     ? e.target.offsetParent.getAttribute('data-page')
+  //     : e.target.getAttribute('data-page');
+  //   //console.log(clickValue);
+  //   this.fetchPoaps(clickValue - 1);
+  // }
   setShow = async (e) => {
     this.setState({ countAlert: false });
   }
@@ -156,15 +165,15 @@ class PoapBurnPage extends Component {
 
       });
     }
-    let active = 1;
-    let items = [];
-    for (let number = 1; number <= this.state.pageCount; number++) {
-      items.push(
-        <Pagination.Item key={number} data-page={number} active={number === active} onChange={this.changePage}>
-          {number}
-        </Pagination.Item>,
-      );
-    }
+    // let active = 1;
+    // let items = [];
+    // for (let number = 1; number <= this.state.pageCount; number++) {
+    //   items.push(
+    //     <Pagination.Item key={number} data-page={number} active={number === active} onChange={this.changePage}>
+    //       {number}
+    //     </Pagination.Item>,
+    //   );
+    // }
     return (
       <div>
         <Row>
@@ -178,23 +187,26 @@ class PoapBurnPage extends Component {
             <Alert variant={this.state.connectedAddressStatus}>{this.state.connectedAddress}</Alert>
           </Col>
         </Row>
-
-        <Button onClick={this.fetchData}>Connect & list POⒶPs</Button> {'   '}
-
+        <Row><Col xs={6}>
+          <Button onClick={this.fetchData}>Connect & list POⒶPs</Button> {'   '}</Col>
+          <Col xs={6}>
+            <Button onClick={this.burn}>Burn 💩 and 🚀 </Button>
+          </Col>
+        </Row>
         <div className="form-row">
           <CardDeck style={{ display: 'flex', flexDirection: 'row' }}>
             {poapCards}
           </CardDeck >
         </div>
-        <br />
+        {/* <br />
         <div className="form-row">
           {this.state.querized && <Pagination onClick={this.changePage}>{items}</Pagination>}
         </div>
-        <br />
+        <br /> */}
         <br></br>
         <Modal show={this.state.countAlert} onHide={this.handleClose}>
 
-          <Modal.Body><div class="card shadow mb-4">
+          <Modal.Body><div className="card shadow mb-4">
             <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
               <Alert.Heading>Less 🔥, more ❤️‍🔥</Alert.Heading>
               <p>
@@ -206,9 +218,7 @@ class PoapBurnPage extends Component {
 
         </Modal>
         <Row>
-          <Col xs={12}>
-            <Button onClick={this.burn}>Burn 💩 and 🚀 </Button>
-          </Col>
+
 
         </Row>
       </div>
