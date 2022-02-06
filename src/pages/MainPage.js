@@ -27,7 +27,7 @@ class MainPage extends Component {
                         <Col xs={6}>
                             <div class="row top-buffer">
                                 <div class="col-xl-6">
-                                    <Button variant="secondary btn-block" onClick={() => history.push('/PoapBurnPage')} size={20}>Burn Poap</Button>
+                                    <Button variant="secondary btn-block" onClick={() => history.push('/PoapBurnPage')} size={20}>POⒶP🔥🎉</Button>
                                 </div>
                             </div>
                         </Col>

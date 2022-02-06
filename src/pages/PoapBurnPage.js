@@ -167,7 +167,8 @@ class PoapBurnPage extends Component {
       <div>
         <Row>
           <Col xs={12}>
-            <h2> 💩 🔥 </h2>
+            <h2> 💩🔥🎉  </h2>
+            <h3> POⒶP Burning Ceremony </h3>
           </Col>
         </Row>
         <Row>
@@ -176,7 +177,7 @@ class PoapBurnPage extends Component {
           </Col>
         </Row>
 
-        <Button variant="secondary btn-block" onClick={this.fetchData}>Show 💩s</Button> {'   '}
+        <Button onClick={this.fetchData}>Connect & list POⒶPs</Button> {'   '}
 
         <div className="form-row">
           <CardDeck style={{ display: 'flex', flexDirection: 'row' }}>
@@ -204,7 +205,7 @@ class PoapBurnPage extends Component {
         </Modal>
         <Row>
           <Col xs={12}>
-            <Button variant="success btn-block" onClick={this.burn}>burn 💩s and mint</Button>
+            <Button onClick={this.burn}>Burn 💩 and 🚀 </Button>
           </Col>
 
         </Row>
