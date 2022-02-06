@@ -15,7 +15,7 @@ class PoapBurnPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      connectedAddress: "Wallet Is Dissconnected!",
+      connectedAddress: "Wallet not Connected!",
       connectedAddressStatus: "warning",
       Poaps: [],
       PoapCount: 0,
@@ -24,28 +24,30 @@ class PoapBurnPage extends Component {
       pageCount: 0,
       querized: false,
       noInPage: 10,
-      countAllert: false
+      countAlert: false,
+      account: ""
     };
   }
   componentDidMount() {
 
   }
+  
   fetchData = async (t) => {
     t.preventDefault();
     console.log('fetchData');
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
-    const account = accounts[0];
-    this.setState({ connectedAddressStatus: "primary", connectedAddress: account });
+    this.account = accounts[0]; // TESTING: use = "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+    this.setState({ connectedAddressStatus: "primary", connectedAddress: this.account });
 
     await window.ethereum.request({
       method: 'wallet_switchEthereumChain',
       params: [{ chainId: '0x64' }], // chainId must be in hexadecimal numbers
     });
-    var gasAmount = await poapcontract.methods.balanceOf("0x90371fc9837c44d3fe17a9be68696fde51fcc011").estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
+    var gasAmount = await poapcontract.methods.balanceOf(this.account).estimateGas({ from: this.account });
 
-    var poapCount = await poapcontract.methods.balanceOf("0x90371fc9837c44d3fe17a9be68696fde51fcc011").call({
-      from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
+    var poapCount = await poapcontract.methods.balanceOf(this.account).call({
+      from: this.account,
       gasAmount,
     });
 
@@ -67,9 +69,9 @@ class PoapBurnPage extends Component {
     var results = [];
     for (var i = this.state.noInPage * pageCount; i < this.state.noInPage * pageCount + this.state.noInPage; i++) {
 
-      var gasAmount = await poapcontract.methods.tokenDetailsOfOwnerByIndex("0x90371fc9837c44d3fe17a9be68696fde51fcc011", i).estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
-      var Poap = await poapcontract.methods.tokenDetailsOfOwnerByIndex("0x90371fc9837c44d3fe17a9be68696fde51fcc011", i).call({
-        from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
+      var gasAmount = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).estimateGas({ from: this.account });
+      var Poap = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).call({
+        from: this.account,
         gasAmount,
       });
       await this.fetchPoapsURI(Poap.tokenId).then(result => {
@@ -92,9 +94,9 @@ class PoapBurnPage extends Component {
     return results;
   };
   fetchPoapsURI = async (tokenId) => {
-    var gasAmount = await poapcontract.methods.tokenURI(tokenId).estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
+    var gasAmount = await poapcontract.methods.tokenURI(tokenId).estimateGas({ from: this.account });
     var PoapURI = await poapcontract.methods.tokenURI(tokenId).call({
-      from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
+      from: this.account,
       gasAmount,
     });
     return PoapURI;
@@ -102,9 +104,9 @@ class PoapBurnPage extends Component {
 
   burn = async (t) => {
     t.preventDefault();
-    var gasAmount = await poapcontract.methods.setApprovalForAll("0x90371fc9837c44d3fe17a9be68696fde51fcc011", true).estimateGas({ from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011" });
-    var result = await poapcontract.methods.setApprovalForAll("0x90371fc9837c44d3fe17a9be68696fde51fcc011", true).send({
-      from: "0x90371fc9837c44d3fe17a9be68696fde51fcc011",
+    var gasAmount = await poapcontract.methods.setApprovalForAll(this.account, true).estimateGas({ from: this.account });
+    var result = await poapcontract.methods.setApprovalForAll(this.account, true).send({
+      from: this.account,
       gasAmount,
     });
   }
@@ -113,7 +115,7 @@ class PoapBurnPage extends Component {
     if (checked) {
       console.log("checked");
       console.log(this.state.PoapsToBurn.length);
-      if (this.state.PoapsToBurn.length == 5) { this.setState({ countAllert: true }); return false; }
+      if (this.state.PoapsToBurn.length == 5) { this.setState({ countAlert: true }); return false; }
       else {
         this.state.PoapsToBurn.push(tokenId);
         return true;
@@ -141,7 +143,7 @@ class PoapBurnPage extends Component {
     this.fetchPoaps(clickValue - 1);
   }
   setShow = async (e) => {
-    this.setState({ countAllert: false });
+    this.setState({ countAlert: false });
   }
 
   render() {
@@ -190,7 +192,7 @@ class PoapBurnPage extends Component {
         </div>
         <br />
         <br></br>
-        <Modal show={this.state.countAllert} onHide={this.handleClose}>
+        <Modal show={this.state.countAlert} onHide={this.handleClose}>
 
           <Modal.Body><div class="card shadow mb-4">
             <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
