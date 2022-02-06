@@ -16,3 +16,10 @@ yarn
 ```
 yarn start
 ```
+
+
+## Todo
+
+- Responsive on mobile
+- make the whole card selectable (tap to select the checkbox)
+- 

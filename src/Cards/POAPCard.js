@@ -25,15 +25,14 @@ class POAPCard extends Component {
         return (
             <div>
                 <br></br>
-                <div className="col xs = {3}" key={this.props.POAP.tokenId}>
+                <div key={this.props.POAP.tokenId}>
                     <div className="container" >
-                        <Card key={this.props.POAP.tokenId} style={{ width: '12vw' }}>
+                        <Card key={this.props.POAP.tokenId} >
+                            <Card.Body class="photo-frame">
+                            <Card.Img width="500" variant="top" src={this.props.POAP.image_url} alt="" />
 
-                            <Card.Img style={{ objectFit: 'cover', borderRadius: 50, width: '12vw', height: '25vh' }} variant="top" src={this.props.POAP.image_url} alt="" />
-
-                            <Card.Body>
                                 <Card.Text>
-                                    Description: {this.props.POAP.name}</Card.Text>
+                                    {this.props.POAP.name}</Card.Text>
                                 <Form>
                                     <Form.Check aria-label="option 1" onChange={this.handleCheckboxChange} checked={this.state.checked}/>
                                 </Form>

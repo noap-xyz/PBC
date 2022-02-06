@@ -148,7 +148,7 @@ class PoapBurnPage extends Component {
     let poapCards;
     if (this.state.renderCards) {
       poapCards = this.state.Poaps.map((POAP, index) => {
-        return (<div className="col-xl-3 col-lg-6">
+        return (<div className="col-md-4 col-lg-2">
           <POAPCard POAP={POAP} index={index} checked={this.checked} />
         </div>)
 
@@ -186,7 +186,7 @@ class PoapBurnPage extends Component {
         </div>
         <br />
         <div className="form-row">
-          {this.state.querized && <Pagination size="sm" onClick={this.changePage}>{items}</Pagination>}
+          {this.state.querized && <Pagination onClick={this.changePage}>{items}</Pagination>}
         </div>
         <br />
         <br></br>
