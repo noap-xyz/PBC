@@ -20,9 +20,10 @@ yarn start
 
 ## Todo
 
-- Responsive on mobile
-- Text for homepage (story with links?)
+- Responsive on mobile - mobile UI
+- Text for homepage (story with links?) - almost done
 - error handling
-- Fix the refresh needed after connection! 
-- HTML headers, we need to add meta data there for link previews and SEO.
+- Fix the refresh needed after wallet connect (this seems fixed?)
+- why buttons have dark blue on left down side? how does it look without them?
+- don't forget all TODO tags
 

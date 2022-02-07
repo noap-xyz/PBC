@@ -36,7 +36,7 @@ class MainPage extends Component {
                             </div>
                             <div class="row top-buffer ">
 
-                                <h2> Why burn POⒶPs?</h2>
+                                <h2> Why !POAPs & NOAPs?</h2>
 
                                 <blockquote class="blockquote">
                                 <p class="mb-0">POAPs drops are a commercial activity subject to US sanctions.</p>
@@ -44,7 +44,20 @@ class MainPage extends Component {
                                 </blockquote>
                                 <div class="row top-buffer text-left">
 
-                                <h5> Backstory: A Farsi podcast, <a href="https://twitter.com/shiryakhat/status/1484547277142245382" target="_blank">Shir Ya Khat</a>, created a POAP to send to their <a href="https://gitcoin.co/grants/152/ethereum-for-farsi-speaking-population" target="_blank">Gitcoin</a> & <a href="https://giveth.io/project/solidity-development-course-in-farsi-by-women-in-blockchain-iran" target="_blank">Giveth</a> grant contributors and was bluntly rejected due to their language being Farsi <small>(and with no connection with any sanctioned countries) </small></h5>
+                                <h3 class="top-buffer">Notarized Attendance Protocol (NOAP)<small> is decentralized stickers as a memorabilia on the BlockChain</small></h3>
+                                <h4>Tl;dr Anyone can create an event and distribute stickers to the attendees.</h4>
+
+                                <h5 class="top-buffer"> Backstory: A Farsi podcast, <a href="https://twitter.com/shiryakhat/status/1484547277142245382" target="_blank">Shir Ya Khat</a>, created a POAP to send to their <a href="https://gitcoin.co/grants/152/ethereum-for-farsi-speaking-population" target="_blank">Gitcoin</a> & <a href="https://giveth.io/project/solidity-development-course-in-farsi-by-women-in-blockchain-iran" target="_blank">Giveth</a> grant contributors and was bluntly rejected due to their language being Farsi.
+                                 {/* TODO: update the above text, the conclusion is weird, needs to be value oriented  */}
+                                {/* <small>(and with no connection with any sanctioned countries).</small>  */}
+                                </h5>
+                                <h6>
+                                ETHDenver #BUIDLATHON limited edition: "The first banned 💩" NFT for every 5 POAPs you NOAP.
+                                </h6>
+                                <h7>
+                                (Only 850 left, #0000 - #1150 has been sent to our beloved Gitcoin & Giveth contributors. We only can go to the moon together, LFG!) 
+                                {/* TODO: update these numbers -- finalize the contributors.json  */}
+                                </h7>
                             </div>
                             </div>
                             
