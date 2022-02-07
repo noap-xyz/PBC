@@ -21,6 +21,7 @@ yarn start
 ## Todo
 
 - Responsive on mobile
-- make the whole card selectable (tap to select the checkbox)
-- Text for homepage (story with links?) --> maybe link to About me page, or remove About from header.
+- Text for homepage (story with links?)
+- error handling
+- Fix the refresh needed after connection! 
 

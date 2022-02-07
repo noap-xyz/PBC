@@ -18,12 +18,12 @@ return (
 		<NavLink to='/'>
 			Home
 		</NavLink>
-		<NavLink to='/mint'>
+		<NavLink to='/PoapBurnPage'>
 			Mint
 		</NavLink>
-		<NavLink to='/about'>
-			About
-		</NavLink>	
+		{/* <NavLink to='https://twitter.com/shiryakhat'>
+			Twitter
+		</NavLink>	 */}
 		{/* Second Nav */}
 		{/* <NavBtnLink to='/sign-in'>Sign In</NavBtnLink> */}
 		</NavMenu>
