@@ -37,7 +37,7 @@ class PoapBurnPage extends Component {
     console.log('fetchData');
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
-    this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011";//accounts[0]; // TESTING: use = "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+    this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011";//TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
     this.setState({ connectedAddressStatus: "primary", connectedAddress: this.account });
 
     await window.ethereum.request({

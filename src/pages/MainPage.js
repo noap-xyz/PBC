@@ -20,6 +20,7 @@ class MainPage extends Component {
 
     render() {
         return (
+
             <div>
 
                 <div class="container">
@@ -38,7 +39,7 @@ class MainPage extends Component {
                                 <h2> Why burn POⒶPs?</h2>
 
                                 <blockquote class="blockquote">
-                                <p class="mb-0">POAPs are a commercial activity subject to US sanctions.</p>
+                                <p class="mb-0">POAPs drops are a commercial activity subject to US sanctions.</p>
                                 <footer class="blockquote-footer">Isabel Gonzalez - <cite title="Source Title">POAP Chief Operating Officer </cite>(<a href="https://twitter.com/shiryakhat/status/1485305351234805764" target="_blank">ref</a>)</footer>
                                 </blockquote>
                                 <div class="row top-buffer text-left">

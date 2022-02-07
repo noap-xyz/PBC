@@ -24,4 +24,5 @@ yarn start
 - Text for homepage (story with links?)
 - error handling
 - Fix the refresh needed after connection! 
+- HTML headers, we need to add meta data there for link previews and SEO.
 
