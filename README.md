@@ -21,6 +21,7 @@ yarn start
 ## Todo
 
 - Responsive on mobile - mobile UI
+- "Connect" button to change color when activated/waiting
 - Text for homepage (story with links?) - almost done
 - error handling
 - Fix the refresh needed after wallet connect (this seems fixed?)
