@@ -29,7 +29,7 @@ class POAPCard extends Component {
         return (
             <div>
                 <br></br>
-                <div key={this.props.POAP.tokenId}>
+                <div >
                     <div className="container" >
                         <Card key={this.props.POAP.tokenId} onClick = {this.handleCheckboxChange} bg={this.state.backGroundColour}>
                             <Card.Body className="photo-frame">
@@ -38,7 +38,7 @@ class POAPCard extends Component {
                                 <Card.Text>
                                     {this.props.POAP.name}</Card.Text>
                                 <Form>
-                                    <Form.Check aria-label="option 1" onChange={this.handleCheckboxChange} checked={this.state.checked}/>
+                                    <Form.Check aria-label="option 1" checked={this.state.checked}/>
                                 </Form>
                             </Card.Body>
                         </Card>

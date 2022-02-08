@@ -1,6 +1,6 @@
 import logo from '../logo.svg';
 import '../App.css';
-import { Row, Col, Alert, Modal } from 'react-bootstrap';
+import { Row, Col, Alert, Modal, Spinner } from 'react-bootstrap';
 import Button from 'react-bootstrap/Button';
 import CardDeck from 'react-bootstrap/CardDeck';
 import React, { Component, useState } from "react";
@@ -25,7 +25,8 @@ class PoapBurnPage extends Component {
       querized: false,
       noInPage: 10,
       countAlert: false,
-      account: ""
+      account: "",
+      loading: false
     };
   }
   componentDidMount() {
@@ -33,8 +34,10 @@ class PoapBurnPage extends Component {
   }
 
   fetchData = async (t) => {
-    //t.preventDefault();
+    t.preventDefault();
     console.log('fetchData');
+    this.setState({ Poaps: [] });
+    this.setState({ loading: true });
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
     this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011";//TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
@@ -67,7 +70,9 @@ class PoapBurnPage extends Component {
     for (var i = 1; i < this.state.pageCount; i++) {
       await this.fetchPoaps(i);
       this.setState({ renderCards: true });
+
     }
+    this.setState({ loading: false });
   }
 
   fetchPoaps = async (pageCount) => {
@@ -160,7 +165,7 @@ class PoapBurnPage extends Component {
     if (this.state.renderCards) {
       poapCards = this.state.Poaps.map((POAP, index) => {
         return (<div className="col-md-4 col-lg-2">
-          <POAPCard POAP={POAP} index={index} checked={this.checked} />
+          <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
         </div>)
 
       });
@@ -187,22 +192,31 @@ class PoapBurnPage extends Component {
             <Alert variant={this.state.connectedAddressStatus}>{this.state.connectedAddress}</Alert>
           </Col>
         </Row>
-        <Row><Col xs={6}>
-          <Button onClick={this.fetchData}>Connect & list POⒶPs</Button> {'   '}</Col>
+        <Row>
+          <Col xs={6}>
+            <Button onClick={this.fetchData} disabled={this.state.loading}>Connect & list POⒶPs</Button> {'   '}</Col>
           <Col xs={6}>
             <Button onClick={this.burn}>Burn 💩 and 🚀 </Button>
           </Col>
         </Row>
-        <div className="form-row">
+        <Row xs={2} md={5} className="g-4">
+          {Array.from(this.state.Poaps).map((POAP, idx) => (
+            <Col>
+              <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
+            </Col>
+          ))}
+        </Row>
+        {/* <Row>
           <CardDeck style={{ display: 'flex', flexDirection: 'row' }}>
             {poapCards}
           </CardDeck >
-        </div>
-        {/* <br />
-        <div className="form-row">
-          {this.state.querized && <Pagination onClick={this.changePage}>{items}</Pagination>}
-        </div>
-        <br /> */}
+        </Row> */}
+        <Row>
+          {this.state.loading && <>
+            <Spinner animation="border" size="sm" />
+          </>}
+        </Row>
+
         <br></br>
         <Modal show={this.state.countAlert} onHide={this.handleClose}>
 
