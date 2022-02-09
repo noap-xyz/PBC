@@ -27,4 +27,5 @@ yarn start
 - Fix the refresh needed after wallet connect (this seems fixed?)
 - why buttons have dark blue on left down side? how does it look without them?
 - don't forget all TODO tags
+- substring of desc to fix card height?
 

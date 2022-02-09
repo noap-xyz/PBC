@@ -36,7 +36,7 @@ class POAPCard extends Component {
                             <Card.Img width="500" variant="top" src={this.props.POAP.image_url} alt="" />
 
                                 <Card.Text>
-                                    {this.props.POAP.name}</Card.Text>
+                                    {(this.props.POAP.name.length >12?this.props.POAP.name.substring(0,12)+"...":this.props.POAP.name)}</Card.Text>
                                 <Form>
                                     <Form.Check aria-label="option 1" checked={this.state.checked}/>
                                 </Form>

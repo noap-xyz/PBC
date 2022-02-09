@@ -86,7 +86,7 @@ class PoapBurnPage extends Component {
       var result = await this.fetchPoapsURI(Poap.tokenId);
       await fetch(result).then(res => res.json()).then(
         result => {
-          console.log(i);
+          //console.log(i);
           var resObj = result;
           resObj.tokenId = Poap.tokenId;
           this.state.Poaps.push(resObj);
@@ -127,8 +127,8 @@ class PoapBurnPage extends Component {
 
   checked = async (t, tokenId, checked) => {
     if (checked) {
-      console.log("checked");
-      console.log(this.state.PoapsToBurn.length);
+      //console.log("checked");
+      //console.log(this.state.PoapsToBurn.length);
       if (this.state.PoapsToBurn.length == 5) { this.setState({ countAlert: true }); return false; }
       else {
         this.state.PoapsToBurn.push(tokenId);
@@ -211,10 +211,13 @@ class PoapBurnPage extends Component {
             {poapCards}
           </CardDeck >
         </Row> */}
+        <br></br>
         <Row>
-          {this.state.loading && <>
-            <Spinner animation="border" size="sm" />
-          </>}
+          <Col xs={12}>
+            {this.state.loading && <>
+              <Spinner animation="border" size="sm" />
+            </>}
+          </Col>
         </Row>
 
         <br></br>
