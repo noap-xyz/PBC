@@ -21,11 +21,11 @@ yarn start
 ## Todo
 
 - Responsive on mobile - mobile UI => Test, should think about reorganizing texts in main page
-- "Connect" button to change color when activated/waiting => disabled
+    - hamburger menu on mobile doesn't work 
 - Text for homepage (story with links?) - almost done
 - error handling
-- Fix the refresh needed after wallet connect (this seems fixed?)
 - why buttons have dark blue on left down side? how does it look without them?
 - don't forget all TODO tags
 - substring of desc to fix card height?
+
 
