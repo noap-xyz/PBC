@@ -1,17 +1,14 @@
-import logo from '../logo.svg';
-import '../App.css';
-import { Row, Col, Alert, Modal, Spinner } from 'react-bootstrap';
-import Button from 'react-bootstrap/Button';
-import CardDeck from 'react-bootstrap/CardDeck';
+import logo from "../logo.svg";
+import "../App.css";
+import { Row, Col, Alert, Modal, Spinner, Container } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import CardDeck from "react-bootstrap/CardDeck";
 import React, { Component, useState } from "react";
-import POAPCard from '../Cards/POAPCard';
-import Pagination from 'react-bootstrap/Pagination'
-import poapcontract from '../utils/poapcontract.js'
-
-
+import POAPCard from "../Cards/POAPCard";
+import Pagination from "react-bootstrap/Pagination";
+import poapcontract from "../utils/poapcontract.js";
 
 class PoapBurnPage extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -26,37 +23,40 @@ class PoapBurnPage extends Component {
       noInPage: 10,
       countAlert: false,
       account: "",
-      loading: false
+      loading: false,
     };
   }
-  componentDidMount() {
-
-  }
+  componentDidMount() {}
 
   fetchData = async (t) => {
     t.preventDefault();
-    console.log('fetchData');
+    console.log("fetchData");
     this.setState({ Poaps: [] });
     this.setState({ loading: true });
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
-    this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011";//TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
-    this.setState({ connectedAddressStatus: "primary", connectedAddress: this.account });
+    this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011"; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+    this.setState({
+      connectedAddressStatus: "primary",
+      connectedAddress: this.account,
+    });
 
     await window.ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x64' }], // chainId must be in hexadecimal numbers
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0x64" }], // chainId must be in hexadecimal numbers
     });
-    var gasAmount = await poapcontract.methods.balanceOf(this.account).estimateGas({ from: this.account });
+    var gasAmount = await poapcontract.methods
+      .balanceOf(this.account)
+      .estimateGas({ from: this.account });
 
     var poapCount = await poapcontract.methods.balanceOf(this.account).call({
       from: this.account,
       gasAmount,
     });
 
-    console.log('poapCount');
+    console.log("poapCount");
     console.log(poapCount);
-    this.setState({ pageCount: (poapCount / this.state.noInPage) + 1 });
+    this.setState({ pageCount: poapCount / this.state.noInPage + 1 });
     this.setState({ poapCount: poapCount });
     //if (this.state.pageCount >= 1) {
     //  this.setState({ querized: true });
@@ -70,72 +70,80 @@ class PoapBurnPage extends Component {
     for (var i = 1; i < this.state.pageCount; i++) {
       await this.fetchPoaps(i);
       this.setState({ renderCards: true });
-
     }
     this.setState({ loading: false });
-  }
+  };
 
   fetchPoaps = async (pageCount) => {
     //t.preventDefault();
     //var results = [];
-    var currMAx = (this.state.noInPage * pageCount) + this.state.noInPage;
+    var currMAx = this.state.noInPage * pageCount + this.state.noInPage;
     var max = currMAx < this.state.poapCount ? currMAx : this.state.poapCount;
 
     for (var i = this.state.noInPage * pageCount; i < max; i++) {
       var Poap = await this.fetchPoap(i);
       var result = await this.fetchPoapsURI(Poap.tokenId);
-      await fetch(result).then(res => res.json()).then(
-        result => {
+      await fetch(result)
+        .then((res) => res.json())
+        .then((result) => {
           //console.log(i);
           var resObj = result;
           resObj.tokenId = Poap.tokenId;
           this.state.Poaps.push(resObj);
           //console.log("resObj");
           //console.log(resObj);
-        }
-      )
-
+        });
     }
-
   };
 
   fetchPoap = async (i) => {
-    var gasAmount = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).estimateGas({ from: this.account });
-    var Poap = await poapcontract.methods.tokenDetailsOfOwnerByIndex(this.account, i).call({
-      from: this.account,
-      gasAmount,
-    });
+    var gasAmount = await poapcontract.methods
+      .tokenDetailsOfOwnerByIndex(this.account, i)
+      .estimateGas({ from: this.account });
+    var Poap = await poapcontract.methods
+      .tokenDetailsOfOwnerByIndex(this.account, i)
+      .call({
+        from: this.account,
+        gasAmount,
+      });
     return Poap;
-  }
+  };
   fetchPoapsURI = async (tokenId) => {
-    var gasAmount = await poapcontract.methods.tokenURI(tokenId).estimateGas({ from: this.account });
+    var gasAmount = await poapcontract.methods
+      .tokenURI(tokenId)
+      .estimateGas({ from: this.account });
     var PoapURI = await poapcontract.methods.tokenURI(tokenId).call({
       from: this.account,
       gasAmount,
     });
     return PoapURI;
-  }
+  };
 
   burn = async (t) => {
     t.preventDefault();
-    var gasAmount = await poapcontract.methods.setApprovalForAll(this.account, true).estimateGas({ from: this.account });
-    var result = await poapcontract.methods.setApprovalForAll(this.account, true).send({
-      from: this.account,
-      gasAmount,
-    });
-  }
+    var gasAmount = await poapcontract.methods
+      .setApprovalForAll(this.account, true)
+      .estimateGas({ from: this.account });
+    var result = await poapcontract.methods
+      .setApprovalForAll(this.account, true)
+      .send({
+        from: this.account,
+        gasAmount,
+      });
+  };
 
   checked = async (t, tokenId, checked) => {
     if (checked) {
       //console.log("checked");
       //console.log(this.state.PoapsToBurn.length);
-      if (this.state.PoapsToBurn.length == 5) { this.setState({ countAlert: true }); return false; }
-      else {
+      if (this.state.PoapsToBurn.length == 5) {
+        this.setState({ countAlert: true });
+        return false;
+      } else {
         this.state.PoapsToBurn.push(tokenId);
         return true;
       }
-    }
-    else {
+    } else {
       console.log("unchecked");
       const index = this.state.PoapsToBurn.indexOf(tokenId);
       if (index > -1) {
@@ -146,7 +154,7 @@ class PoapBurnPage extends Component {
     console.log("this.state.PoapsToBurn");
     console.log(this.state.PoapsToBurn);
     return true;
-  }
+  };
 
   // changePage = async (e) => {
   //   //console.log('pagination');
@@ -158,16 +166,17 @@ class PoapBurnPage extends Component {
   // }
   setShow = async (e) => {
     this.setState({ countAlert: false });
-  }
+  };
 
   render() {
-    let poapCards;
+    let poapCards = [];
     if (this.state.renderCards) {
       poapCards = this.state.Poaps.map((POAP, index) => {
-        return (<div className="col-md-4 col-lg-2">
-          <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
-        </div>)
-
+        return (
+          <div className="col-md-4 col-lg-2">
+            <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
+          </div>
+        );
       });
     }
     // let active = 1;
@@ -180,30 +189,40 @@ class PoapBurnPage extends Component {
     //   );
     // }
     return (
-      <div>
+      <Container>
         <Row>
           <Col xs={12}>
-            <h2> 💩🔥🎉  </h2>
+            <h2> 💩🔥🎉 </h2>
             <h3> POⒶP Burning Ceremony </h3>
           </Col>
         </Row>
         <Row>
           <Col xs={12}>
-            <Alert variant={this.state.connectedAddressStatus}>{this.state.connectedAddress}</Alert>
+            <Alert variant={this.state.connectedAddressStatus}>
+              {this.state.connectedAddress}
+            </Alert>
           </Col>
         </Row>
         <Row>
-          <Col xs={6}>
-            <Button onClick={this.fetchData} disabled={this.state.loading}>Connect & list POⒶPs</Button> {'   '}</Col>
-          <Col xs={6}>
-            <Button onClick={this.burn}>Burn 💩 and 🚀 </Button>
+          <Col md={6} style={{ paddingBottom: "10px" }}>
+            <Button
+              className="glitch"
+              onClick={this.fetchData}
+              disabled={this.state.loading}
+            >
+              Connect & list POⒶPs
+            </Button>{" "}
+            {"   "}
+          </Col>
+          <Col md={6}>
+            <Button className="glitch" onClick={this.burn}>
+              Burn 💩 and 🚀{" "}
+            </Button>
           </Col>
         </Row>
-        <Row xs={2} md={5} className="g-4">
+        <Row md={2} lg={5}>
           {Array.from(this.state.Poaps).map((POAP, idx) => (
-            <Col>
-              <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
-            </Col>
+            <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
           ))}
         </Row>
         {/* <Row>
@@ -214,31 +233,32 @@ class PoapBurnPage extends Component {
         <br></br>
         <Row>
           <Col xs={12}>
-            {this.state.loading && <>
-              <Spinner animation="border" size="sm" />
-            </>}
+            {this.state.loading && (
+              <>
+                <Spinner animation="border" size="sm" />
+              </>
+            )}
           </Col>
         </Row>
 
         <br></br>
-        <Modal show={this.state.countAlert} onHide={this.handleClose}>
-
-          <Modal.Body><div className="card shadow mb-4">
-            <Alert variant="danger" onClose={() => this.setShow(false)} dismissible>
-              <Alert.Heading>Less 🔥, more ❤️‍🔥</Alert.Heading>
-              <p>
-                Keep some POⒶPs, they used to be good peeps.
-        </p>
-            </Alert>
-          </div>
-          </Modal.Body>
-
+        <Modal
+          show={this.state.countAlert}
+          onHide={this.handleClose}
+          style={{ paddingTop: "20%" }}
+        >
+          <Alert
+            variant="danger"
+            onClose={() => this.setShow(false)}
+            dismissible
+            style={{ marginBottom: "0px" }}
+          >
+            <Alert.Heading>Less 🔥, more ❤️‍🔥</Alert.Heading>
+            <p>Keep some POⒶPs, they used to be good peeps.</p>
+          </Alert>
         </Modal>
-        <Row>
-
-
-        </Row>
-      </div>
+        <Row></Row>
+      </Container>
     );
   }
 }
