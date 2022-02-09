@@ -27,5 +27,5 @@ yarn start
 - why buttons have dark blue on left down side? how does it look without them?
 - don't forget all TODO tags
 - substring of desc to fix card height?
-
+- check if "Unrecognized chain id" -- meaning no xdai available. need to add network
 
