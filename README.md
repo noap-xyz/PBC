@@ -18,6 +18,12 @@ yarn start
 ```
 
 
+## Deploy
+run
+```
+npm run deploy
+```
+
 ## Todo
 
 - Text for homepage (story with links?) - almost done
