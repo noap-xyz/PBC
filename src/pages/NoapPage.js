@@ -181,7 +181,7 @@ class NoapPage extends Component {
           </Col>
         </Row>
         <Row>
-          <Col md={6} style={{ paddingBottom: "10px" }}>
+          {/* <Col md={6} style={{ paddingBottom: "10px" }}>
             <Button
               className="glitch"
               onClick={this.Mint}
@@ -190,7 +190,7 @@ class NoapPage extends Component {
               Mint Poap
             </Button>{" "}
             {"   "}
-          </Col>
+          </Col> */}
           <Col md={6} style={{ paddingBottom: "10px" }}>
             <Button
               className="glitch"
