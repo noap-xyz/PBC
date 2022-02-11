@@ -77,45 +77,66 @@ class NoapPage extends Component {
     console.log("fetchData");
     this.setState({ Noaps: [] });
     this.setState({ loading: true });
-    console.log(window.ethereum);
-    const accounts = await window.ethereum.enable();
-    this.account = accounts[0]; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
-    this.setState({
-      connectedAddressStatus: "primary",
-      connectedAddress: this.account,
-    });
+    try {
+      console.log(window.ethereum);
+      const accounts = await window.ethereum.enable();
+      this.account = accounts[0]; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+      this.setState({
+        connectedAddressStatus: "primary",
+        connectedAddress: this.account,
+      });
 
-    // await window.ethereum.request({
-    //   method: "wallet_switchEthereumChain",
-    //   params: [{ chainId: "0x64" }], // chainId must be in hexadecimal numbers
-    // });
-    var gasAmount = await noapcontract.methods
-      .balanceOf(this.account)
-      .estimateGas({ from: this.account });
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x64' }],
+        });
+      } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{ chainId: "0x64", chainName: "Gnosis Chain", rpcUrls: ["https://rpc.gnosischain.com/"] }], // chainId must be in hexadecimal numbers
+            });
+          } catch (addError) {
+            // handle "add" error
+          }
+        }
+        // handle other "switch" errors
+      }
 
-    var noapCount = await noapcontract.methods.balanceOf(this.account).call({
-      from: this.account,
-      gasAmount,
-    });
+      var gasAmount = await noapcontract.methods
+        .balanceOf(this.account)
+        .estimateGas({ from: this.account });
 
-    console.log("noapCount");
-    console.log(noapCount);
-    this.setState({ pageCount: noapCount / this.state.noInPage + 1 });
-    this.setState({ noapCount: noapCount });
-    //if (this.state.pageCount >= 1) {
-    //  this.setState({ querized: true });
-    //}
-    //
+      var noapCount = await noapcontract.methods.balanceOf(this.account).call({
+        from: this.account,
+        gasAmount,
+      });
 
-    await this.fetchNoaps(0);
+      console.log("noapCount");
+      console.log(noapCount);
+      this.setState({ pageCount: noapCount / this.state.noInPage + 1 });
+      this.setState({ noapCount: noapCount });
+      //if (this.state.pageCount >= 1) {
+      //  this.setState({ querized: true });
+      //}
+      //
 
-    this.setState({ renderCards: true });
+      await this.fetchNoaps(0);
 
-    // for (var i = 1; i < this.state.pageCount; i++) {
-    //   await this.fetchNoaps(i);
-    //   this.setState({ renderCards: true });
-    // }
-    // this.setState({ loading: false });
+      this.setState({ renderCards: true });
+
+      for (var i = 1; i < this.state.pageCount; i++) {
+        await this.fetchNoaps(i);
+        this.setState({ renderCards: true });
+      }
+      this.setState({ loading: false });
+    } catch (error) {
+      console.error(error);
+      this.setState({ loading: false });
+    }
     // console.log(this.state.Noaps);
   };
 
@@ -151,7 +172,7 @@ class NoapPage extends Component {
         from: this.account,
         gasAmount,
       });
-      console.log(Noap);
+    console.log(Noap);
     return Noap;
   };
   fetchNoapsURI = async (tokenId) => {
@@ -195,7 +216,6 @@ class NoapPage extends Component {
             <Button
               className="glitch"
               onClick={this.CreateEvent}
-              disabled={this.state.loading}
             >
               Create Event
             </Button>{" "}
@@ -222,7 +242,7 @@ class NoapPage extends Component {
             <NOAPCard Noap={Noap} key={Noap.tokenId} />
           ))}
         </Row>
-        
+
       </Container>
     );
   }

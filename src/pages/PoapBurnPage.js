@@ -43,51 +43,67 @@ class PoapBurnPage extends Component {
     console.log("fetchData");
     this.setState({ Poaps: [] });
     this.setState({ loading: true });
-    console.log(window.ethereum);
-    const accounts = await window.ethereum.enable();
-    this.account = accounts[0]; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
-    this.setState({
-      connectedAddressStatus: "primary",
-      connectedAddress: this.account,
-    });
-    await window.ethereum.request({
-      method: "wallet_addEthereumChain",
-      params: [{ chainId: "0x64" ,chainName:"Gnosis Chain",rpcUrls:["https://rpc.gnosischain.com/"]}], // chainId must be in hexadecimal numbers
-    });
+    try {
+      console.log(window.ethereum);
+      const accounts = await window.ethereum.enable();
+      this.account = accounts[0]; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+      this.setState({
+        connectedAddressStatus: "primary",
+        connectedAddress: this.account,
+      });
 
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x64" }], // chainId must be in hexadecimal numbers
-    });
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x64' }],
+        });
+      } catch (switchError) {
+        // This error code indicates that the chain has not been added to MetaMask.
+        if (switchError.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [{ chainId: "0x64", chainName: "Gnosis Chain", rpcUrls: ["https://rpc.gnosischain.com/"] }], // chainId must be in hexadecimal numbers
+            });
+          } catch (addError) {
+            // handle "add" error
+          }
+        }
+        // handle other "switch" errors
+      }
 
 
-    var gasAmount = await poapcontract.methods
-      .balanceOf(this.account)
-      .estimateGas({ from: this.account });
+      var gasAmount = await poapcontract.methods
+        .balanceOf(this.account)
+        .estimateGas({ from: this.account });
 
-    var poapCount = await poapcontract.methods.balanceOf(this.account).call({
-      from: this.account,
-      gasAmount,
-    });
+      var poapCount = await poapcontract.methods.balanceOf(this.account).call({
+        from: this.account,
+        gasAmount,
+      });
 
-    console.log("poapCount");
-    console.log(poapCount);
-    this.setState({ pageCount: poapCount / this.state.noInPage + 1 });
-    this.setState({ poapCount: poapCount });
-    //if (this.state.pageCount >= 1) {
-    //  this.setState({ querized: true });
-    //}
-    //
+      console.log("poapCount");
+      console.log(poapCount);
+      this.setState({ pageCount: poapCount / this.state.noInPage + 1 });
+      this.setState({ poapCount: poapCount });
+      //if (this.state.pageCount >= 1) {
+      //  this.setState({ querized: true });
+      //}
+      //
 
-    await this.fetchPoaps(0);
+      await this.fetchPoaps(0);
 
-    this.setState({ renderCards: true });
-
-    for (var i = 1; i < this.state.pageCount; i++) {
-      await this.fetchPoaps(i);
       this.setState({ renderCards: true });
+
+      for (var i = 1; i < this.state.pageCount; i++) {
+        await this.fetchPoaps(i);
+        this.setState({ renderCards: true });
+      }
+      this.setState({ loading: false });
+    } catch (error) {
+      console.error(error);
+      this.setState({ loading: false });
     }
-    this.setState({ loading: false });
   };
 
   fetchPoaps = async (pageCount) => {
@@ -102,13 +118,13 @@ class PoapBurnPage extends Component {
       await fetch(result)
         .then((res) => res.json())
         .then((result) => {
-      console.log(i);
-      var resObj = result;
-      resObj.tokenId = Poap.tokenId;
-      this.state.Poaps.push(resObj);
-      console.log("resObj");
-      console.log(resObj);
-      });
+          console.log(i);
+          var resObj = result;
+          resObj.tokenId = Poap.tokenId;
+          this.state.Poaps.push(resObj);
+          console.log("resObj");
+          console.log(resObj);
+        });
     }
   };
 
