@@ -3,6 +3,7 @@ import { Router, Switch, Route } from "react-router-dom";
 
 import PoapBurnPage from "./pages/PoapBurnPage";
 import Home from "./pages/MainPage";
+import NoapPage from "./pages/NoapPage";
 import history from "./utils/history";
 import Navbar from "./components/Navbar";
 
@@ -14,6 +15,7 @@ export default class Routes extends Component {
         <Switch>
           <Route path="/" exact component={Home} />
           <Route path="/PoapBurnPage" component={PoapBurnPage} />
+          <Route path="/NoapPage" component={NoapPage} />
         </Switch>
       </Router>
     );

@@ -49,6 +49,7 @@ class POAPCard extends Component {
                   <Form.Check
                     aria-label="option 1"
                     checked={this.state.checked}
+                    readOnly
                   />
                 </Form>
               </Card.Body>

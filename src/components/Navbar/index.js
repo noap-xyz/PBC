@@ -15,6 +15,7 @@ const Navbar = () => {
         <NavMenu>
           <NavLink to="/">Home</NavLink>
           <NavLink to="/PoapBurnPage">Mint</NavLink>
+          <NavLink to="/NoapPage">NOAP</NavLink>
           {/* <NavLink to='https://twitter.com/shiryakhat'>
 			Twitter
 		</NavLink>	 */}

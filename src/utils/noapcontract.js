@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import { PoapContractABI } from "../abi/PoapContractABI";
+import { NoapContractABI } from "../abi/NoapContractABI";
 import contractAddresses from "./contractAddresses.js"
 
 const OPTIONS = {
@@ -8,11 +8,11 @@ const OPTIONS = {
   transactionBlockTimeout: 5
 }
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545", null, OPTIONS);
-var poapContractAddress;
+var noapContractAddress;
 console.log("web3.givenProvider.chainId");
 console.log(web3.givenProvider.chainId);
-poapContractAddress = contractAddresses.poapContractAddress;
+noapContractAddress = contractAddresses.noapContractAddress;
 
-const poapcontract = new web3.eth.Contract(PoapContractABI, poapContractAddress);
+const noapcontract = new web3.eth.Contract(NoapContractABI, noapContractAddress);
 
-export default poapcontract;
+export default noapcontract;

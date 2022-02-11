@@ -1,0 +1,22 @@
+{
+  "name": "NOAP",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "ethers": "^5.5.1",
+    "openzeppelin-solidity": "3.4.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "esm": "^3.2.25",
+    "ethereum-waffle": "^3.4.0",
+    "mocha": "^9.1.3"
+  },
+  "scripts": {
+    "build": "./node_modules/ethereum-waffle/bin/waffle",
+    "flatten": "npm run build flatten",
+    "test": "export NODE_ENV=test && ./node_modules/mocha/bin/mocha --require esm"
+  },
+  "author": "",
+  "license": "MIT"
+}

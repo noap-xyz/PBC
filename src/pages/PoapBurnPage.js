@@ -1,4 +1,4 @@
-import logo from "../logo.svg";
+import web3 from "../utils/web3";
 import "../App.css";
 import { Row, Col, Alert, Modal, Spinner, Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
@@ -7,6 +7,8 @@ import React, { Component, useState } from "react";
 import POAPCard from "../Cards/POAPCard";
 import Pagination from "react-bootstrap/Pagination";
 import poapcontract from "../utils/poapcontract.js";
+import noapcontract from "../utils/noapcontract.js";
+import contractAddresses from "../utils/contractAddresses.js"
 
 class PoapBurnPage extends Component {
   constructor(props) {
@@ -24,9 +26,17 @@ class PoapBurnPage extends Component {
       countAlert: false,
       account: "",
       loading: false,
+      contracts: [
+        contractAddresses.poapContractAddress,
+        contractAddresses.poapContractAddress,
+        contractAddresses.poapContractAddress,
+        contractAddresses.poapContractAddress,
+        contractAddresses.poapContractAddress
+      ]
     };
+
   }
-  componentDidMount() {}
+  componentDidMount() { }
 
   fetchData = async (t) => {
     t.preventDefault();
@@ -35,16 +45,22 @@ class PoapBurnPage extends Component {
     this.setState({ loading: true });
     console.log(window.ethereum);
     const accounts = await window.ethereum.enable();
-    this.account = "0x90371fc9837c44d3fe17a9be68696fde51fcc011"; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
+    this.account = accounts[0]; //TODO change back to accounts[0]; // TEST with "0x90371fc9837c44d3fe17a9be68696fde51fcc011"
     this.setState({
       connectedAddressStatus: "primary",
       connectedAddress: this.account,
+    });
+    await window.ethereum.request({
+      method: "wallet_addEthereumChain",
+      params: [{ chainId: "0x64" ,chainName:"Gnosis Chain",rpcUrls:["https://rpc.gnosischain.com/"]}], // chainId must be in hexadecimal numbers
     });
 
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: "0x64" }], // chainId must be in hexadecimal numbers
     });
+
+
     var gasAmount = await poapcontract.methods
       .balanceOf(this.account)
       .estimateGas({ from: this.account });
@@ -86,13 +102,13 @@ class PoapBurnPage extends Component {
       await fetch(result)
         .then((res) => res.json())
         .then((result) => {
-          //console.log(i);
-          var resObj = result;
-          resObj.tokenId = Poap.tokenId;
-          this.state.Poaps.push(resObj);
-          //console.log("resObj");
-          //console.log(resObj);
-        });
+      console.log(i);
+      var resObj = result;
+      resObj.tokenId = Poap.tokenId;
+      this.state.Poaps.push(resObj);
+      console.log("resObj");
+      console.log(resObj);
+      });
     }
   };
 
@@ -121,15 +137,52 @@ class PoapBurnPage extends Component {
 
   burn = async (t) => {
     t.preventDefault();
-    var gasAmount = await poapcontract.methods
-      .setApprovalForAll(this.account, true)
-      .estimateGas({ from: this.account });
-    var result = await poapcontract.methods
-      .setApprovalForAll(this.account, true)
-      .send({
-        from: this.account,
-        gasAmount,
-      });
+    //console.log("this.account");
+    //console.log(this.account);
+    var uri = "https://shiryakhat.net/astronauts/0000.json";
+    if (this.state.PoapsToBurn.length == 5) {
+      /////////////////////////////////////////////Approve
+      var approved = await poapcontract.methods
+        .isApprovedForAll(this.account, contractAddresses.noapContractAddress)
+        .call({
+          from: this.account
+        });
+      if (!approved) {
+        console.log("Not Approved");
+        var gasAmount = await poapcontract.methods
+          .setApprovalForAll(contractAddresses.noapContractAddress, true)
+          .estimateGas({ from: this.account });
+        var result = await poapcontract.methods
+          .setApprovalForAll(contractAddresses.noapContractAddress, true)
+          .send({
+            from: this.account,
+            gasAmount,
+          });
+      }
+      ///////////////////////////////////////////Burn
+
+      var gasAmount = await noapcontract.methods
+        .burnAndRemintBatchDenver(this.state.contracts, [
+          this.state.PoapsToBurn[0],
+          this.state.PoapsToBurn[1],
+          this.state.PoapsToBurn[2],
+          this.state.PoapsToBurn[3],
+          this.state.PoapsToBurn[4],
+        ], uri)
+        .estimateGas({ from: this.account });
+      var result = await noapcontract.methods
+        .burnAndRemintBatchDenver(this.state.contracts, [
+          this.state.PoapsToBurn[0],
+          this.state.PoapsToBurn[1],
+          this.state.PoapsToBurn[2],
+          this.state.PoapsToBurn[3],
+          this.state.PoapsToBurn[4],
+        ], uri)
+        .send({
+          from: this.account,
+          gasAmount,
+        });
+    }
   };
 
   checked = async (t, tokenId, checked) => {
@@ -144,26 +197,19 @@ class PoapBurnPage extends Component {
         return true;
       }
     } else {
-      console.log("unchecked");
+      //console.log("unchecked");
       const index = this.state.PoapsToBurn.indexOf(tokenId);
       if (index > -1) {
         this.state.PoapsToBurn.splice(index, 1); // 2nd parameter means remove one item only }
         //this.state.PoapsToBurn.remove(tokenId);
       }
     }
-    console.log("this.state.PoapsToBurn");
+    //console.log("this.state.PoapsToBurn");
     console.log(this.state.PoapsToBurn);
     return true;
   };
 
-  // changePage = async (e) => {
-  //   //console.log('pagination');
-  //   const clickValue = e.target.offsetParent.getAttribute('data-page')
-  //     ? e.target.offsetParent.getAttribute('data-page')
-  //     : e.target.getAttribute('data-page');
-  //   //console.log(clickValue);
-  //   this.fetchPoaps(clickValue - 1);
-  // }
+
   setShow = async (e) => {
     this.setState({ countAlert: false });
   };
@@ -220,7 +266,7 @@ class PoapBurnPage extends Component {
             </Button>
           </Col>
         </Row>
-        <Row md={2} lg={5}>
+        <Row xs={2} md={2} lg={5}>
           {Array.from(this.state.Poaps).map((POAP, idx) => (
             <POAPCard POAP={POAP} checked={this.checked} key={POAP.tokenId} />
           ))}
