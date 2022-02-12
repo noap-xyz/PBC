@@ -9,8 +9,6 @@ const OPTIONS = {
 }
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545", null, OPTIONS);
 var noapContractAddress;
-console.log("web3.givenProvider.chainId");
-console.log(web3.givenProvider.chainId);
 noapContractAddress = contractAddresses.noapContractAddress;
 
 const noapcontract = new web3.eth.Contract(NoapContractABI, noapContractAddress);
