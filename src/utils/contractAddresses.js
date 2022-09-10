@@ -1,2 +1,0 @@
-const contractAddresses = {noapContractAddress:"0xf86DeB28b15e26229002D1948b7C8a0a13536fc2",poapContractAddress:"0x22c1f6050e56d2876009903609a2cc3fef83b415"}
-export default contractAddresses
