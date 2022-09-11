@@ -1,7 +1,10 @@
-# Getting Started with Create React App
+# **NOAP** 🔥🔥🔥🔥
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The **No**tarized **A**ttendance **P**rotocole, is a way for event organizers to notarize participation and issue digital badges or receipts (NOAPs) to the event attendees.
 
+## Project overview
+
+The NOAP provide the possibility to create events and issue NOAPs. By using the NOAP **ANYONE** can create an event. 
 ## Available Scripts
 
 In the project directory, you can run:
