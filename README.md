@@ -1,18 +1,12 @@
-<<<<<<< HEAD
 # **NOAP** 🔥🔥🔥🔥
 
 The **No**tarized **A**ttendance **P**rotocole, is a way for event organizers to notarize participation and issue digital badges or receipts (NOAPs) to the event attendees.
-=======
-# NOAP 🔥🔥🔥
-
-The **No**tarized **A**ttendance **P**rotocol, is a way for event organizers to notarize participation and issue digital receipts to event attendees.
 
 ## How to use 🤷‍♀️🤷‍♀️🤷‍♀️
 
 With the NOAPs **ANYONE** can create events. In order to create an event the organizer should fill the following form with the required informations.
 
-![This is an image](src/images/formCreate.jpg)
->>>>>>> 3163d6d71ecd1ced11c362241154bedf75c572d4
+![This is an image](public/formCreate.jpg)
 
 ## Project overview
 
