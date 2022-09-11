@@ -8,9 +8,8 @@ With the NOAPs **ANYONE** can create events. In order to create an event the org
 
 ![This is an image](public/formCreate.jpg)
 
-## Project overview
+Attendees of NOAP events can claim their NOAPs after attending a certain NOAP evnet by entring the ETH address of the organizer in search bar of the events page. All the events created by the organizer will be displayed and the attendees can find the event they want.
 
-The NOAP provide the possibility to create events and issue NOAPs. By using the NOAP **ANYONE** can create an event. 
 ## Available Scripts
 
 In the project directory, you can run:
