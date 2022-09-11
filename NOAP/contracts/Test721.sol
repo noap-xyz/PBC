@@ -7,7 +7,7 @@ pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 
 contract Test721 is ERC721URIStorage {
-    constructor()  ERC721("TESTs", "TEST") {}
+    constructor() ERC721("TESTs", "TEST") {}
 
     function mint(
         uint256 tokenID, // refference

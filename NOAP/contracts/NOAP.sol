@@ -48,10 +48,6 @@ contract NOAP is
         bool minted;
     }
 
-
-   
-    
-
     mapping(address => EnumerableSet.UintSet) private userEventIDs;
     mapping(uint256 => EnumerableSet.UintSet) private eventRequestIDs;
 
@@ -92,7 +88,11 @@ contract NOAP is
     /**
      * Mint a single token
      */
-    function mint(uint256 eventID, address recipient,uint requestID) external {
+    function mint(
+        uint256 eventID,
+        address recipient,
+        uint requestID
+    ) external {
         requests[requestID].minted = true;
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
@@ -100,25 +100,34 @@ contract NOAP is
         _mintEventToken(recipient, eventID);
     }
 
-    function bytesToAddress(bytes memory bys) private pure returns (address addr) {
-    assembly {
-        addr := mload(add(bys, 32))
-    } 
-}
+    function bytesToAddress(bytes memory bys)
+        private
+        pure
+        returns (address addr)
+    {
+        assembly {
+            addr := mload(add(bys, 32))
+        }
+    }
+
     /**
      * Mint multiple tokens for a single event
      */
-    function mintBatch(uint256 eventID, bytes[] memory recipients,uint256[] memory requestIds) external {
+    function mintBatch(
+        uint256 eventID,
+        bytes[] memory recipients,
+        uint256[] memory requestIds
+    ) external {
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
         _checkSenderIsMinter(evt);
         address[] memory addr;
 
-        for (uint256 i=0;i<requestIds.length;i++) {
-            requests[i].minted =true;
+        for (uint256 i = 0; i < requestIds.length; i++) {
+            requests[i].minted = true;
         }
 
-        for(uint256 i = 0; i < recipients.length; i++) {
+        for (uint256 i = 0; i < recipients.length; i++) {
             addr[i] = bytesToAddress(recipients[i]);
         }
 
@@ -127,25 +136,35 @@ contract NOAP is
         }
     }
 
-   
-
     /**
      * Create an event based on the metadata URI.
      * The caller is the sole minter.
      * Each event is a unique <contract, tokenURI> pair and cannot be recreated.
      */
-    function createEvent(string memory tokenURI,
-     string memory description,
-     string memory name,
-     string memory country,
-     string memory city,
-     bool  online,
-     string memory date,
-     string memory creatorEmail) external returns(uint256) {
+    function createEvent(
+        string memory tokenURI,
+        string memory description,
+        string memory name,
+        string memory country,
+        string memory city,
+        bool online,
+        string memory date,
+        string memory creatorEmail
+    ) external returns (uint256) {
         //address(this) refers to the address of the contract instance
         bytes32 eventHash = _computeEventHash(address(this), tokenURI);
 
-        uint256 eventID = _createEvent(eventHash, tokenURI,description,name,country,city,online,date,creatorEmail);
+        uint256 eventID = _createEvent(
+            eventHash,
+            tokenURI,
+            description,
+            name,
+            country,
+            city,
+            online,
+            date,
+            creatorEmail
+        );
 
         Evt storage evt = evts[eventID];
         evt.minters.add(_msgSender());
@@ -155,18 +174,21 @@ contract NOAP is
         return eventID;
     }
 
-     //createRequest(eventId,attender,date)
-    
+    //createRequest(eventId,attender,date)
+
     //mint for one person
     //mint for multi-user
     //add minters
     //end event
- /**
+    /**
      * Claim a noap
      * authorized to be done by everyone
      */
-    function createRequest(uint256 eventID,address attender,string memory date) 
-    external {
+    function createRequest(
+        uint256 eventID,
+        address attender,
+        string memory date
+    ) external {
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
         uint256 requestID = ++requestIDCounter;
@@ -176,9 +198,6 @@ contract NOAP is
         requests[requestID].minted = false;
         eventRequestIDs[eventID].add(requestID);
     }
-
-
-
 
     /**
      * Token minting from other contracts (burned and reminted here) cannot be halted.
@@ -214,18 +233,15 @@ contract NOAP is
 
     function _createEvent(
         bytes32 eventHash,
-     string memory tokenURI,
-     string memory description,
-     string memory name,
-     string memory country,
-     string memory city,
-     bool  online,
-     string memory date,
-     string memory creatorEmail
-    )
-        internal
-        returns (uint256)
-    {
+        string memory tokenURI,
+        string memory description,
+        string memory name,
+        string memory country,
+        string memory city,
+        bool online,
+        string memory date,
+        string memory creatorEmail
+    ) internal returns (uint256) {
         require(
             hashToEventID[eventHash] == _NULL_EVENT_ID,
             "Event already created"
@@ -275,72 +291,54 @@ contract NOAP is
         return evts[eventID].minters.length();
     }
 
-    //this is what I added 
-     function getRequestUser(uint256 requestId)
-        public
-        view 
-        returns(address) 
-        {
-            return requests[requestId].attender;
-        }
+    //this is what I added
+    function getRequestUser(uint256 requestId) public view returns (address) {
+        return requests[requestId].attender;
+    }
 
- function getRequestDate(uint256 requestId)
+    function getRequestDate(uint256 requestId)
         public
-        view 
-        returns(string memory) 
-        {
-            return requests[requestId].date;
-        }
+        view
+        returns (string memory)
+    {
+        return requests[requestId].date;
+    }
 
-         function getRequestIsMinted(uint256 requestId)
-        public
-        view 
-        returns(bool) 
-        {
-            return requests[requestId].minted;
-        }
-
+    function getRequestIsMinted(uint256 requestId) public view returns (bool) {
+        return requests[requestId].minted;
+    }
 
     function getEventDescription(uint256 eventID)
         public
-        view 
-        returns(string memory) 
-        {
-            return evts[eventID].description;
-        }
+        view
+        returns (string memory)
+    {
+        return evts[eventID].description;
+    }
 
+    function getEventName(uint256 eventID) public view returns (string memory) {
+        return evts[eventID].name;
+    }
 
-         function getEventName(uint256 eventID)
+    function getEventCountry(uint256 eventID)
         public
-        view 
-        returns(string memory) 
-        {
-            return evts[eventID].name;
-        }
+        view
+        returns (string memory)
+    {
+        return evts[eventID].country;
+    }
 
-        function getEventCountry(uint256 eventID)
-        public
-        view 
-        returns(string memory) 
-        {
-            return evts[eventID].country;
-        }
+    function getEventCity(uint256 eventID) public view returns (string memory) {
+        return evts[eventID].city;
+    }
 
-         function getEventCity(uint256 eventID)
+    function getCreatorEmail(uint256 eventID)
         public
-        view 
-        returns(string memory) 
-        {
-            return evts[eventID].city;
-        }
-
-         function getCreatorEmail(uint256 eventID)
-        public
-        view 
-        returns(string memory) 
-        {
-            return evts[eventID].creatorEmail;
-        }
+        view
+        returns (string memory)
+    {
+        return evts[eventID].creatorEmail;
+    }
 
     function getEventMinterAt(uint256 eventID, uint256 index)
         public
@@ -350,22 +348,13 @@ contract NOAP is
         return evts[eventID].minters.at(index);
     }
 
-     function getEventDate(uint256 eventID)
-        public
-        view 
-        returns(string memory) 
-        {
-            return evts[eventID].date;
-        }
-
-         function getEventIsOnline(uint256 eventID)
-        public
-        view
-        returns (bool)
-    {
-        return evts[eventID].online;
+    function getEventDate(uint256 eventID) public view returns (string memory) {
+        return evts[eventID].date;
     }
 
+    function getEventIsOnline(uint256 eventID) public view returns (bool) {
+        return evts[eventID].online;
+    }
 
     function getEventIsMinter(uint256 eventID, address addr)
         public
@@ -449,10 +438,9 @@ contract NOAP is
         return userEventIDs[user].length();
     }
 
-      function getRequestsLength(uint256 eventID) public view returns (uint256) {
+    function getRequestsLength(uint256 eventID) public view returns (uint256) {
         return eventRequestIDs[eventID].length();
     }
-
 
     function getUserEventAt(address user, uint256 index)
         public
@@ -470,8 +458,6 @@ contract NOAP is
         return eventRequestIDs[eventID].at(index);
     }
 
-
-
     function getUserEventIDs(address user)
         public
         view
@@ -485,21 +471,18 @@ contract NOAP is
         return eventIDs;
     }
 
-   
     function getEventRequestIDs(uint256 eventID)
         public
         view
-        returns(uint256[] memory) {
-            uint256 totalRequests = getRequestsLength(eventID);
-            uint256[] memory requestIDs = new uint256[](totalRequests);
-            for(uint256 i=0;i < totalRequests ; i++) {
-                requestIDs[i] = getEventRequestAt(eventID,i);
-            }
-            return requestIDs;
+        returns (uint256[] memory)
+    {
+        uint256 totalRequests = getRequestsLength(eventID);
+        uint256[] memory requestIDs = new uint256[](totalRequests);
+        for (uint256 i = 0; i < totalRequests; i++) {
+            requestIDs[i] = getEventRequestAt(eventID, i);
         }
-
-    
-
+        return requestIDs;
+    }
 
     /**
      * ERC2981 royalty implementation
