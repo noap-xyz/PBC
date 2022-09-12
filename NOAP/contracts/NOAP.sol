@@ -1,42 +1,84 @@
 // SPDX-License-Identifier: MIT
 // https://github.com/OpenZeppelin/openzeppelin-contracts/commit/8e0296096449d9b1cd7c5631e917330635244c37
-import 'openzeppelin-solidity/contracts/utils/EnumerableSet.sol';
-import 'openzeppelin-solidity/contracts/token/ERC721/ERC721Burnable.sol';
-import 'openzeppelin-solidity/contracts/cryptography/ECDSA.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-import './IERC2981.sol';
-import './BaseRelayRecipient.sol';
+import "../node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "../node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "../node_modules/@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Context.sol";
+
+import "./IERC2981.sol";
+import "./BaseRelayRecipient.sol";
 
 pragma experimental ABIEncoderV2;
-pragma solidity 0.6.12;
+pragma solidity >=0.4.22 <0.9.0;
 
-contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
+contract NOAP is
+    Context,
+    ERC165Storage,
+    ERC721Burnable,
+    BaseRelayRecipient,
+    IERC2981
+{
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    string private constant ERROR_INVALID_INPUTS = "Each field must have the same number of values";
+    string private constant ERROR_INVALID_INPUTS =
+        "Each field must have the same number of values";
 
     struct Evt {
         bool ended;
         address royalty;
         string tokenURI;
+        string description;
+        string name;
+        string country;
+        string city;
+        bool online;
+        string date;
+        string creatorEmail;
+        EnumerableSet.UintSet tokens;
         EnumerableSet.AddressSet minters;
     }
 
-    mapping(address => EnumerableSet.UintSet) private userEventIDs;
+    struct Req {
+        uint256 eventID;
+        address attender;
+        string date;
+        bool minted;
+    }
 
+    mapping(address => EnumerableSet.UintSet) private userEventIDs;
+    mapping(uint256 => EnumerableSet.UintSet) private eventRequestIDs;
+
+    mapping(uint256 => Req) requests;
     mapping(uint256 => Evt) evts;
     mapping(uint256 => uint256) private tokenToEventID;
     mapping(bytes32 => uint256) private hashToEventID;
     uint256 private tokenIDCounter;
     uint256 private eventIDCounter;
+    uint256 private requestIDCounter;
 
     uint256 private constant _NULL_EVENT_ID = 0;
-    address private constant _NULL_ADDRESS = 0x0000000000000000000000000000000000000000;
+    address private constant _NULL_ADDRESS =
+        0x0000000000000000000000000000000000000000;
 
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
-    constructor() public ERC721("NOAPs", "NOAP") {
+    // override supportsInterface
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC165Storage, ERC721, IERC165)
+        returns (bool)
+    {
+        return interfaceId == type(IERC165).interfaceId;
+    }
+
+    //
+
+    constructor() ERC721("NOAPs", "NOAP") {
         _registerInterface(_INTERFACE_ID_ERC2981);
 
         // hardcode the trusted forwarded for EIP2771 metatransactions
@@ -48,12 +90,24 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
      */
     function mint(
         uint256 eventID,
-        address recipient
+        address recipient,
+        uint requestID
     ) external {
+        requests[requestID].minted = true;
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
         _checkSenderIsMinter(evt);
         _mintEventToken(recipient, eventID);
+    }
+
+    function bytesToAddress(bytes memory bys)
+        private
+        pure
+        returns (address addr)
+    {
+        assembly {
+            addr := mload(add(bys, 32))
+        }
     }
 
     /**
@@ -61,101 +115,94 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
      */
     function mintBatch(
         uint256 eventID,
-        address[] memory recipients
+        bytes[] memory recipients,
+        uint256[] memory requestIds
     ) external {
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
         _checkSenderIsMinter(evt);
+        address[] memory addr;
 
-        for (uint i = 0; i < recipients.length; i++) {
-            _mintEventToken(recipients[i], eventID);
+        for (uint256 i = 0; i < requestIds.length; i++) {
+            requests[i].minted = true;
+        }
+
+        for (uint256 i = 0; i < recipients.length; i++) {
+            addr[i] = bytesToAddress(recipients[i]);
+        }
+
+        for (uint256 i = 0; i < recipients.length; i++) {
+            _mintEventToken(addr[i], eventID);
         }
     }
 
-    /**
-     * Burn a token from another contract and mint it here, copying the metadata
-     * The token owner must have `approve` this contract to access the token beforehand
-     */
-    function burnAndRemint(
-        address tokenContract,
-        uint256 tokenID
-    ) public {
-        require(tokenContract != address(this), "Cannot burn and remint on the same contract");
-
-        // Grab the tokenURI
-        ERC721Burnable collection = ERC721Burnable(tokenContract);
-        string memory tokenURI = collection.tokenURI(tokenID);
-
-        // Burn the source NFT
-        collection.transferFrom(_msgSender(), address(this), tokenID);
-        collection.burn(tokenID);
-
-        // Load the event obj from the URI, creating a new event ID if non-existent
-        bytes32 eventHash = _computeEventHash(tokenContract, tokenURI);
-        uint256 eventID = hashToEventID[eventHash];
-        if (eventID == _NULL_EVENT_ID) {
-            eventID = _createEvent(eventHash, tokenURI);
-        }
-
-        _mintEventToken(_msgSender(), eventID);
-    }
-
-    /**
-     * Batch API to burn and remint, for those feeling frisky.
-     */
-    function burnAndRemintBatch(
-        address[] memory tokenContracts,
-        uint256[] memory tokenIDs
-    ) external {
-        require(tokenContracts.length == tokenIDs.length, ERROR_INVALID_INPUTS);
-        for (uint i = 0; i < tokenContracts.length; i++) {
-            burnAndRemint(tokenContracts[i], tokenIDs[i]);
-        }
-    }
-    /**
-     * Batch API to burn and remint, for those feeling frisky.
-     */
-    function burnAndRemintBatchDenver(
-        address[] memory tokenContracts,
-        uint256[] memory tokenIDs,
-        string memory tokenURI
-    ) external {
-        bytes32 eventHash = _computeEventHash(address(this), tokenURI);
-        uint256 eventID = hashToEventID[eventHash];
-        require(eventID != _NULL_EVENT_ID,"Event Does Not Exist!");
-        Evt storage evt = evts[eventID];
-        require(!evt.ended, "Event Ended");
-        require(tokenContracts.length == tokenIDs.length && tokenIDs.length == 5, ERROR_INVALID_INPUTS);
-        for (uint i = 0; i < tokenContracts.length; i++) {
-            burnAndRemint(tokenContracts[i], tokenIDs[i]);
-        }        
-        _mintEventToken(_msgSender(), eventID);
-    }
     /**
      * Create an event based on the metadata URI.
      * The caller is the sole minter.
      * Each event is a unique <contract, tokenURI> pair and cannot be recreated.
      */
     function createEvent(
-        string memory tokenURI
-    ) external {
+        string memory tokenURI,
+        string memory description,
+        string memory name,
+        string memory country,
+        string memory city,
+        bool online,
+        string memory date,
+        string memory creatorEmail
+    ) external returns (uint256) {
+        //address(this) refers to the address of the contract instance
         bytes32 eventHash = _computeEventHash(address(this), tokenURI);
-        uint256 eventID = _createEvent(eventHash, tokenURI);
+
+        uint256 eventID = _createEvent(
+            eventHash,
+            tokenURI,
+            description,
+            name,
+            country,
+            city,
+            online,
+            date,
+            creatorEmail
+        );
 
         Evt storage evt = evts[eventID];
         evt.minters.add(_msgSender());
         evt.royalty = _msgSender();
 
         userEventIDs[_msgSender()].add(eventID);
+        return eventID;
+    }
+
+    //createRequest(eventId,attender,date)
+
+    //mint for one person
+    //mint for multi-user
+    //add minters
+    //end event
+    /**
+     * Claim a noap
+     * authorized to be done by everyone
+     */
+    function createRequest(
+        uint256 eventID,
+        address attender,
+        string memory date
+    ) external {
+        Evt storage evt = evts[eventID];
+        require(!evt.ended, "Event Ended");
+        uint256 requestID = ++requestIDCounter;
+        requests[requestID].eventID = eventID;
+        requests[requestID].attender = attender;
+        requests[requestID].date = date;
+        requests[requestID].minted = false;
+        eventRequestIDs[eventID].add(requestID);
     }
 
     /**
-     * End the event, halting minting.
      * Token minting from other contracts (burned and reminted here) cannot be halted.
      */
-    function endEvent(
-        uint256 eventID
-    ) external {
+    function endEvent(uint256 eventID) external {
         Evt storage evt = evts[eventID];
         _checkSenderIsMinter(evt);
         evt.ended = true;
@@ -164,10 +211,7 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
     /**
      * Add a minter to the event. Minter can create infinite tokens. Caller must be a minter
      */
-    function addEventMinter(
-        uint256 eventID,
-        address minter
-    ) external {
+    function addEventMinter(uint256 eventID, address minter) external {
         Evt storage evt = evts[eventID];
         _checkSenderIsMinter(evt);
         evt.minters.add(minter);
@@ -175,9 +219,7 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         userEventIDs[minter].add(eventID);
     }
 
-    function renounceEventMinter(
-        uint256 eventID
-    ) external {
+    function renounceEventMinter(uint256 eventID) external {
         Evt storage evt = evts[eventID];
         _checkSenderIsMinter(evt);
         evt.minters.remove(_msgSender());
@@ -185,20 +227,35 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         userEventIDs[_msgSender()].remove(eventID);
     }
 
-    function _checkSenderIsMinter(
-        Evt storage evt
-    ) internal view {
+    function _checkSenderIsMinter(Evt storage evt) internal view {
         require(evt.minters.contains(_msgSender()), "Not event minter");
     }
 
     function _createEvent(
         bytes32 eventHash,
-        string memory tokenURI
+        string memory tokenURI,
+        string memory description,
+        string memory name,
+        string memory country,
+        string memory city,
+        bool online,
+        string memory date,
+        string memory creatorEmail
     ) internal returns (uint256) {
-        require(hashToEventID[eventHash] == _NULL_EVENT_ID, "Event already created");
+        require(
+            hashToEventID[eventHash] == _NULL_EVENT_ID,
+            "Event already created"
+        );
 
         uint256 eventID = ++eventIDCounter;
         evts[eventID].tokenURI = tokenURI;
+        evts[eventID].description = description;
+        evts[eventID].name = name;
+        evts[eventID].country = country;
+        evts[eventID].city = city;
+        evts[eventID].date = date;
+        evts[eventID].creatorEmail = creatorEmail;
+        evts[eventID].online = online;
 
         // Map the event hash back to the Event
         hashToEventID[eventHash] = eventID;
@@ -206,23 +263,225 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         return eventID;
     }
 
-    function _mintEventToken(
-        address recipient,
-        uint256 eventID
-    ) internal {
+    function _mintEventToken(address recipient, uint256 eventID) internal {
         // Mint the token. ID is generated by hashing the source contract and id, bitmasked for shortness
         uint256 tokenID = ++tokenIDCounter;
         _mint(recipient, tokenID);
+
+        // Increment the minted counter
+        evts[eventID].tokens.add(tokenID);
 
         // Map the token back to the Event
         tokenToEventID[tokenID] = eventID;
     }
 
-    function _computeEventHash(
-        address tokenContract,
-        string memory tokenURI
-    ) internal pure returns (bytes32) {
+    function _computeEventHash(address tokenContract, string memory tokenURI)
+        internal
+        pure
+        returns (bytes32)
+    {
         return keccak256(abi.encode(tokenContract, tokenURI));
+    }
+
+    function getEventMinterTotal(uint256 eventID)
+        public
+        view
+        returns (uint256)
+    {
+        return evts[eventID].minters.length();
+    }
+
+    //this is what I added
+    function getRequestUser(uint256 requestId) public view returns (address) {
+        return requests[requestId].attender;
+    }
+
+    function getRequestDate(uint256 requestId)
+        public
+        view
+        returns (string memory)
+    {
+        return requests[requestId].date;
+    }
+
+    function getRequestIsMinted(uint256 requestId) public view returns (bool) {
+        return requests[requestId].minted;
+    }
+
+    function getEventDescription(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
+        return evts[eventID].description;
+    }
+
+    function getEventName(uint256 eventID) public view returns (string memory) {
+        return evts[eventID].name;
+    }
+
+    function getEventCountry(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
+        return evts[eventID].country;
+    }
+
+    function getEventCity(uint256 eventID) public view returns (string memory) {
+        return evts[eventID].city;
+    }
+
+    function getCreatorEmail(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
+        return evts[eventID].creatorEmail;
+    }
+
+    function getEventMinterAt(uint256 eventID, uint256 index)
+        public
+        view
+        returns (address)
+    {
+        return evts[eventID].minters.at(index);
+    }
+
+    function getEventDate(uint256 eventID) public view returns (string memory) {
+        return evts[eventID].date;
+    }
+
+    function getEventIsOnline(uint256 eventID) public view returns (bool) {
+        return evts[eventID].online;
+    }
+
+    function getEventIsMinter(uint256 eventID, address addr)
+        public
+        view
+        returns (bool)
+    {
+        return evts[eventID].minters.contains(addr);
+    }
+
+    function getEventTokenSupply(uint256 eventID)
+        public
+        view
+        returns (uint256)
+    {
+        return evts[eventID].tokens.length();
+    }
+
+    function getEventTokenURI(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
+        return evts[eventID].tokenURI;
+    }
+
+    function getEventTokenIDAt(uint256 eventID, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
+        return evts[eventID].tokens.at(index);
+    }
+
+    function getEventTokenIDs(uint256 eventID)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256 supply = getEventTokenSupply(eventID);
+        uint256[] memory tokenIDs = new uint256[](supply);
+        for (uint256 i = 0; i < tokenIDs.length; i++) {
+            tokenIDs[i] = getEventTokenIDAt(eventID, i);
+        }
+        return tokenIDs;
+    }
+
+    function getEventTokenHolders(uint256 eventID)
+        public
+        view
+        returns (address[] memory)
+    {
+        uint256 supply = getEventTokenSupply(eventID);
+        address[] memory owners = new address[](supply);
+        for (uint256 i = 0; i < owners.length; i++) {
+            owners[i] = ownerOf(getEventTokenIDAt(eventID, i));
+        }
+        return owners;
+    }
+
+    function getEventEnded(uint256 eventID) public view returns (bool) {
+        return evts[eventID].ended;
+    }
+
+    function getEventRoyaltyAddress(uint256 eventID)
+        public
+        view
+        returns (address)
+    {
+        return evts[eventID].royalty;
+    }
+
+    function getLastTokenID() public view returns (uint256) {
+        return tokenIDCounter;
+    }
+
+    function getLastEventID() public view returns (uint256) {
+        return eventIDCounter;
+    }
+
+    function getUserEventTotal(address user) public view returns (uint256) {
+        return userEventIDs[user].length();
+    }
+
+    function getRequestsLength(uint256 eventID) public view returns (uint256) {
+        return eventRequestIDs[eventID].length();
+    }
+
+    function getUserEventAt(address user, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
+        return userEventIDs[user].at(index);
+    }
+
+    function getEventRequestAt(uint256 eventID, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
+        return eventRequestIDs[eventID].at(index);
+    }
+
+    function getUserEventIDs(address user)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256 numEvents = getUserEventTotal(user);
+        uint256[] memory eventIDs = new uint256[](numEvents);
+        for (uint256 i = 0; i < numEvents; i++) {
+            eventIDs[i] = getUserEventAt(user, i);
+        }
+        return eventIDs;
+    }
+
+    function getEventRequestIDs(uint256 eventID)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256 totalRequests = getRequestsLength(eventID);
+        uint256[] memory requestIDs = new uint256[](totalRequests);
+        for (uint256 i = 0; i < totalRequests; i++) {
+            requestIDs[i] = getEventRequestAt(eventID, i);
+        }
+        return requestIDs;
     }
 
     /**
@@ -230,10 +489,12 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
      * For events created using this contract, we hardcode a 10% resale royalty the corresponding tokens
      * The recipient of this royalty is controlled by the event minters.
      */
-    function royaltyInfo(
-        uint256 tokenID,
-        uint256 salePrice
-    ) external view override returns (address, uint256) {
+    function royaltyInfo(uint256 tokenID, uint256 salePrice)
+        external
+        view
+        override
+        returns (address, uint256)
+    {
         address royalty = evts[tokenToEventID[tokenID]].royalty;
         if (royalty == _NULL_ADDRESS) {
             // For tokens that are burned and reminted,
@@ -252,37 +513,51 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         _checkSenderIsMinter(evt);
         evt.royalty = receiver;
     }
+
     /* -- END ERC2981 methods */
 
     /**
      * Overwrite the default `tokenURI` getter.
      * Since all events have the same tokenURI, resolve tokenIDs to events load the URI from the event
      */
-    function tokenURI(uint256 tokenID) public view virtual override returns (string memory) {
-        require(_exists(tokenID), "ERC721Metadata: URI query for nonexistent token");
+    //this will make a warning because it is the same name as tokenURI variable
+    function tokenURI(uint256 tokenID)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenID),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
         return evts[tokenToEventID[tokenID]].tokenURI;
     }
 
-    function isApprovedOrOwner(
-        address spender,
-        uint256 tokenID
-    ) external view returns (bool) {
+    function burn(uint256 tokenID) public virtual override {
+        super.burn(tokenID);
+        evts[tokenToEventID[tokenID]].tokens.remove(tokenID);
+    }
+
+    function isApprovedOrOwner(address spender, uint256 tokenID)
+        external
+        view
+        returns (bool)
+    {
         return _isApprovedOrOwner(spender, tokenID);
     }
 
     /* -- BEGIN batch methods */
-    function burnBatch(
-        uint256[] memory tokenIDs
-    ) external {
+    function burnBatch(uint256[] memory tokenIDs) external {
         for (uint256 i = 0; i < tokenIDs.length; ++i) {
             burn(tokenIDs[i]);
         }
     }
 
-    function approveBatch(
-        address[] memory tos,
-        uint256[] memory tokenIDs
-    ) external {
+    function approveBatch(address[] memory tos, uint256[] memory tokenIDs)
+        external
+    {
         require(tos.length == tokenIDs.length, ERROR_INVALID_INPUTS);
         for (uint256 i = 0; i < tos.length; ++i) {
             approve(tos[i], tokenIDs[i]);
@@ -295,8 +570,7 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         uint256[] memory tokenIDs
     ) external {
         require(
-            froms.length == tos.length &&
-            froms.length == tokenIDs.length,
+            froms.length == tos.length && froms.length == tokenIDs.length,
             ERROR_INVALID_INPUTS
         );
         for (uint256 i = 0; i < froms.length; ++i) {
@@ -310,8 +584,7 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         uint256[] memory tokenIDs
     ) external {
         require(
-            froms.length == tos.length &&
-            froms.length == tokenIDs.length,
+            froms.length == tos.length && froms.length == tokenIDs.length,
             ERROR_INVALID_INPUTS
         );
         for (uint256 i = 0; i < froms.length; ++i) {
@@ -327,8 +600,8 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
     ) external {
         require(
             froms.length == tos.length &&
-            froms.length == tokenIDs.length &&
-            froms.length == datas.length,
+                froms.length == tokenIDs.length &&
+                froms.length == datas.length,
             ERROR_INVALID_INPUTS
         );
         for (uint256 i = 0; i < froms.length; ++i) {
@@ -336,64 +609,16 @@ contract NOAP is ERC721Burnable, BaseRelayRecipient, IERC2981 {
         }
     }
 
-    function isApprovedOrOwnerBatch(
-        address[] memory spenders,
-        uint256[] memory tokenIDs
-    ) external view returns (bool[] memory) {
-        require(spenders.length == tokenIDs.length, ERROR_INVALID_INPUTS);
-        bool[] memory approvals = new bool[](spenders.length);
-        for (uint256 i = 0; i < spenders.length; ++i) {
-            approvals[i] = _isApprovedOrOwner(spenders[i], tokenIDs[i]);
-        }
-        return approvals;
-    }
-
-    function existsBatch(
-        uint256[] memory tokenIDs
-    ) external view returns (bool[] memory) {
-        bool[] memory exists = new bool[](tokenIDs.length);
-        for (uint256 i = 0; i < tokenIDs.length; ++i) {
-            exists[i] = _exists(tokenIDs[i]);
-        }
-        return exists;
-    }
     /* -- END batch methods */
 
-    function getLastTokenID() public view returns (uint) {
-        return tokenIDCounter;
-    }
-
-    function getLastEventID() public view returns (uint) {
-        return eventIDCounter;
-    }
-
-    function getUserEventTotal(
-        address user
-    ) public view returns (uint256) {
-        return userEventIDs[user].length();
-    }
-
-    function getUserEventAt(
-        address user,
-        uint256 index
-    ) public view returns (uint256) {
-        return userEventIDs[user].at(index);
-    }
-
-    function getUserEventIDs(
-        address user
-    ) public view returns (uint256[] memory) {
-        uint256 numEvents = getUserEventTotal(user);
-        uint256[] memory eventIDs = new uint256[](numEvents);
-        for (uint i = 0; i < numEvents; i++) {
-            eventIDs[i] = getUserEventAt(user, i);
-        }
-        return eventIDs;
-    }
-
     /* -- BEGIN IRelayRecipient overrides -- */
-    function _msgSender() internal override(Context, BaseRelayRecipient) view returns (address payable) {
-        return BaseRelayRecipient._msgSender();
+    function _msgSender()
+        internal
+        view
+        override(Context, BaseRelayRecipient)
+        returns (address payable)
+    {
+        return payable(BaseRelayRecipient._msgSender());
     }
 
     string public override versionRecipient = "1";
