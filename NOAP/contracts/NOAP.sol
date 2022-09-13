@@ -13,11 +13,18 @@ import "./BaseRelayRecipient.sol";
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
 
-contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IERC2981 {
+contract NOAP is
+    Context,
+    ERC165Storage,
+    ERC721Burnable,
+    BaseRelayRecipient,
+    IERC2981
+{
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    string private constant ERROR_INVALID_INPUTS = "Each field must have the same number of values";
+    string private constant ERROR_INVALID_INPUTS =
+        "Each field must have the same number of values";
 
     struct Evt {
         bool ended;
@@ -53,7 +60,8 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     uint256 private requestIDCounter;
 
     uint256 private constant _NULL_EVENT_ID = 0;
-    address private constant _NULL_ADDRESS = 0x0000000000000000000000000000000000000000;
+    address private constant _NULL_ADDRESS =
+        0x0000000000000000000000000000000000000000;
 
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
@@ -83,7 +91,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     function mint(
         uint256 eventID,
         address recipient,
-        uint256 requestID
+        uint requestID
     ) external {
         requests[requestID].minted = true;
         Evt storage evt = evts[eventID];
@@ -92,7 +100,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         _mintEventToken(recipient, eventID);
     }
 
-    function bytesToAddress(bytes memory bys) private pure returns (address addr) {
+    function bytesToAddress(bytes memory bys)
+        private
+        pure
+        returns (address addr)
+    {
         assembly {
             addr := mload(add(bys, 32))
         }
@@ -230,7 +242,10 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         string memory date,
         string memory creatorEmail
     ) internal returns (uint256) {
-        require(hashToEventID[eventHash] == _NULL_EVENT_ID, "Event already created");
+        require(
+            hashToEventID[eventHash] == _NULL_EVENT_ID,
+            "Event already created"
+        );
 
         uint256 eventID = ++eventIDCounter;
         evts[eventID].tokenURI = tokenURI;
@@ -268,7 +283,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return keccak256(abi.encode(tokenContract, tokenURI));
     }
 
-    function getEventMinterTotal(uint256 eventID) public view returns (uint256) {
+    function getEventMinterTotal(uint256 eventID)
+        public
+        view
+        returns (uint256)
+    {
         return evts[eventID].minters.length();
     }
 
@@ -277,7 +296,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return requests[requestId].attender;
     }
 
-    function getRequestDate(uint256 requestId) public view returns (string memory) {
+    function getRequestDate(uint256 requestId)
+        public
+        view
+        returns (string memory)
+    {
         return requests[requestId].date;
     }
 
@@ -285,7 +308,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return requests[requestId].minted;
     }
 
-    function getEventDescription(uint256 eventID) public view returns (string memory) {
+    function getEventDescription(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
         return evts[eventID].description;
     }
 
@@ -293,7 +320,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return evts[eventID].name;
     }
 
-    function getEventCountry(uint256 eventID) public view returns (string memory) {
+    function getEventCountry(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
         return evts[eventID].country;
     }
 
@@ -301,11 +332,19 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return evts[eventID].city;
     }
 
-    function getCreatorEmail(uint256 eventID) public view returns (string memory) {
+    function getCreatorEmail(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
         return evts[eventID].creatorEmail;
     }
 
-    function getEventMinterAt(uint256 eventID, uint256 index) public view returns (address) {
+    function getEventMinterAt(uint256 eventID, uint256 index)
+        public
+        view
+        returns (address)
+    {
         return evts[eventID].minters.at(index);
     }
 
@@ -317,23 +356,43 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return evts[eventID].online;
     }
 
-    function getEventIsMinter(uint256 eventID, address addr) public view returns (bool) {
+    function getEventIsMinter(uint256 eventID, address addr)
+        public
+        view
+        returns (bool)
+    {
         return evts[eventID].minters.contains(addr);
     }
 
-    function getEventTokenSupply(uint256 eventID) public view returns (uint256) {
+    function getEventTokenSupply(uint256 eventID)
+        public
+        view
+        returns (uint256)
+    {
         return evts[eventID].tokens.length();
     }
 
-    function getEventTokenURI(uint256 eventID) public view returns (string memory) {
+    function getEventTokenURI(uint256 eventID)
+        public
+        view
+        returns (string memory)
+    {
         return evts[eventID].tokenURI;
     }
 
-    function getEventTokenIDAt(uint256 eventID, uint256 index) public view returns (uint256) {
+    function getEventTokenIDAt(uint256 eventID, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
         return evts[eventID].tokens.at(index);
     }
 
-    function getEventTokenIDs(uint256 eventID) public view returns (uint256[] memory) {
+    function getEventTokenIDs(uint256 eventID)
+        public
+        view
+        returns (uint256[] memory)
+    {
         uint256 supply = getEventTokenSupply(eventID);
         uint256[] memory tokenIDs = new uint256[](supply);
         for (uint256 i = 0; i < tokenIDs.length; i++) {
@@ -342,7 +401,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return tokenIDs;
     }
 
-    function getEventTokenHolders(uint256 eventID) public view returns (address[] memory) {
+    function getEventTokenHolders(uint256 eventID)
+        public
+        view
+        returns (address[] memory)
+    {
         uint256 supply = getEventTokenSupply(eventID);
         address[] memory owners = new address[](supply);
         for (uint256 i = 0; i < owners.length; i++) {
@@ -355,7 +418,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return evts[eventID].ended;
     }
 
-    function getEventRoyaltyAddress(uint256 eventID) public view returns (address) {
+    function getEventRoyaltyAddress(uint256 eventID)
+        public
+        view
+        returns (address)
+    {
         return evts[eventID].royalty;
     }
 
@@ -375,15 +442,27 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return eventRequestIDs[eventID].length();
     }
 
-    function getUserEventAt(address user, uint256 index) public view returns (uint256) {
+    function getUserEventAt(address user, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
         return userEventIDs[user].at(index);
     }
 
-    function getEventRequestAt(uint256 eventID, uint256 index) public view returns (uint256) {
+    function getEventRequestAt(uint256 eventID, uint256 index)
+        public
+        view
+        returns (uint256)
+    {
         return eventRequestIDs[eventID].at(index);
     }
 
-    function getUserEventIDs(address user) public view returns (uint256[] memory) {
+    function getUserEventIDs(address user)
+        public
+        view
+        returns (uint256[] memory)
+    {
         uint256 numEvents = getUserEventTotal(user);
         uint256[] memory eventIDs = new uint256[](numEvents);
         for (uint256 i = 0; i < numEvents; i++) {
@@ -392,7 +471,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return eventIDs;
     }
 
-    function getEventRequestIDs(uint256 eventID) public view returns (uint256[] memory) {
+    function getEventRequestIDs(uint256 eventID)
+        public
+        view
+        returns (uint256[] memory)
+    {
         uint256 totalRequests = getRequestsLength(eventID);
         uint256[] memory requestIDs = new uint256[](totalRequests);
         for (uint256 i = 0; i < totalRequests; i++) {
@@ -438,8 +521,17 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
      * Since all events have the same tokenURI, resolve tokenIDs to events load the URI from the event
      */
     //this will make a warning because it is the same name as tokenURI variable
-    function tokenURI(uint256 tokenID) public view virtual override returns (string memory) {
-        require(_exists(tokenID), "ERC721Metadata: URI query for nonexistent token");
+    function tokenURI(uint256 tokenID)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenID),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
         return evts[tokenToEventID[tokenID]].tokenURI;
     }
 
@@ -448,7 +540,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         evts[tokenToEventID[tokenID]].tokens.remove(tokenID);
     }
 
-    function isApprovedOrOwner(address spender, uint256 tokenID) external view returns (bool) {
+    function isApprovedOrOwner(address spender, uint256 tokenID)
+        external
+        view
+        returns (bool)
+    {
         return _isApprovedOrOwner(spender, tokenID);
     }
 
@@ -459,7 +555,9 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         }
     }
 
-    function approveBatch(address[] memory tos, uint256[] memory tokenIDs) external {
+    function approveBatch(address[] memory tos, uint256[] memory tokenIDs)
+        external
+    {
         require(tos.length == tokenIDs.length, ERROR_INVALID_INPUTS);
         for (uint256 i = 0; i < tos.length; ++i) {
             approve(tos[i], tokenIDs[i]);
@@ -514,8 +612,13 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     /* -- END batch methods */
 
     /* -- BEGIN IRelayRecipient overrides -- */
-    function _msgSender() internal view override(Context, BaseRelayRecipient) returns (address) {
-        return BaseRelayRecipient._msgSender();
+    function _msgSender()
+        internal
+        view
+        override(Context, BaseRelayRecipient)
+        returns (address payable)
+    {
+        return payable(BaseRelayRecipient._msgSender());
     }
 
     string public override versionRecipient = "1";

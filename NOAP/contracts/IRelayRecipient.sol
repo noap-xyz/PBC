@@ -11,7 +11,11 @@ abstract contract IRelayRecipient {
      * the forwarder is required to verify the sender's signature, and verify
      * the call is not a replay.
      */
-    function isTrustedForwarder(address forwarder) public view virtual returns (bool);
+    function isTrustedForwarder(address forwarder)
+        public
+        view
+        virtual
+        returns (bool);
 
     /**
      * return the sender of this call.
@@ -20,7 +24,7 @@ abstract contract IRelayRecipient {
      * otherwise, return `msg.sender`
      * should be used in the contract anywhere instead of msg.sender
      */
-    function _msgSender() internal view virtual returns (address);
+    function _msgSender() internal view virtual returns (address payable);
 
     function versionRecipient() external view virtual returns (string memory);
 }
