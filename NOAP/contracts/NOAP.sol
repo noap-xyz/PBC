@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 // https://github.com/OpenZeppelin/openzeppelin-contracts/commit/8e0296096449d9b1cd7c5631e917330635244c37
-import '../node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
-import '../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol';
-import '../node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
-import '../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol';
-import '../node_modules/@openzeppelin/contracts/utils/introspection/ERC165Storage.sol';
-import '../node_modules/@openzeppelin/contracts/utils/Context.sol';
+import "../node_modules/@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "../node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "../node_modules/@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
+import "../node_modules/@openzeppelin/contracts/utils/Context.sol";
 
-import './IERC2981.sol';
-import './BaseRelayRecipient.sol';
+import "./IERC2981.sol";
+import "./BaseRelayRecipient.sol";
 
 pragma experimental ABIEncoderV2;
 pragma solidity >=0.4.22 <0.9.0;
@@ -17,7 +17,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
 
-    string private constant ERROR_INVALID_INPUTS = 'Each field must have the same number of values';
+    string private constant ERROR_INVALID_INPUTS = "Each field must have the same number of values";
 
     struct Evt {
         bool ended;
@@ -70,7 +70,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
 
     //
 
-    constructor() ERC721('NOAPs', 'NOAP') {
+    constructor() ERC721("NOAPs", "NOAP") {
         _registerInterface(_INTERFACE_ID_ERC2981);
 
         // hardcode the trusted forwarded for EIP2771 metatransactions
@@ -87,7 +87,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     ) external {
         requests[requestID].minted = true;
         Evt storage evt = evts[eventID];
-        require(!evt.ended, 'Event Ended');
+        require(!evt.ended, "Event Ended");
         _checkSenderIsMinter(evt);
         _mintEventToken(recipient, eventID);
     }
@@ -107,7 +107,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         uint256[] memory requestIds
     ) external {
         Evt storage evt = evts[eventID];
-        require(!evt.ended, 'Event Ended');
+        require(!evt.ended, "Event Ended");
         _checkSenderIsMinter(evt);
         address[] memory addr;
 
@@ -178,7 +178,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         string memory date
     ) external {
         Evt storage evt = evts[eventID];
-        require(!evt.ended, 'Event Ended');
+        require(!evt.ended, "Event Ended");
         uint256 requestID = ++requestIDCounter;
         requests[requestID].eventID = eventID;
         requests[requestID].attender = attender;
@@ -230,10 +230,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         string memory date,
         string memory creatorEmail
     ) internal returns (uint256) {
-        require(
-            hashToEventID[eventHash] == _NULL_EVENT_ID,
-            "Event already created"
-        );
+        require(hashToEventID[eventHash] == _NULL_EVENT_ID, "Event already created");
 
         uint256 eventID = ++eventIDCounter;
         evts[eventID].tokenURI = tokenURI;
@@ -442,7 +439,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
      */
     //this will make a warning because it is the same name as tokenURI variable
     function tokenURI(uint256 tokenID) public view virtual override returns (string memory) {
-        require(_exists(tokenID), 'ERC721Metadata: URI query for nonexistent token');
+        require(_exists(tokenID), "ERC721Metadata: URI query for nonexistent token");
         return evts[tokenToEventID[tokenID]].tokenURI;
     }
 
@@ -493,7 +490,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
             ERROR_INVALID_INPUTS
         );
         for (uint256 i = 0; i < froms.length; ++i) {
-            safeTransferFrom(froms[i], tos[i], tokenIDs[i], '');
+            safeTransferFrom(froms[i], tos[i], tokenIDs[i], "");
         }
     }
 
@@ -521,6 +518,6 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return BaseRelayRecipient._msgSender();
     }
 
-    string public override versionRecipient = '1';
+    string public override versionRecipient = "1";
     /* -- END IRelayRecipient overrides -- */
 }
