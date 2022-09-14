@@ -47,8 +47,14 @@
     "react-app-rewired": "^2.2.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
-    "url": "^0.11.0"
-  },  
+    "url": "^0.11.0",
+    "husky": "^8.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run test && npm run lint && npm run prettier:solidity"
+    }
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
