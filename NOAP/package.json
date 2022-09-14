@@ -17,7 +17,6 @@
     "@truffle/hdwallet-provider": "^2.0.14",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.7.0",
-    "openzeppelin-solidity": "^4.6.0",
     "solc": "^0.8.17",
     "truffle": "^5.5.29"
   },
@@ -29,5 +28,10 @@
     "prettier-plugin-solidity": "^1.0.0-beta.24",
     "solhint": "^3.3.7",
     "solhint-plugin-prettier": "^0.0.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run test && npm run lint && npm run prettier:solidity"
+    }
   }
 }
