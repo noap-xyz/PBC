@@ -59,35 +59,35 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\nimport \"../node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol\";\n\npragma solidity >=0.4.22 <0.9.0;\n\n///\n/// @dev Interface for the NFT Royalty Standard\n///\ninterface IERC2981 is IERC165 {\n    /// ERC165 bytes to add to interface array - set in parent contract\n    /// implementing this standard\n    ///\n    /// bytes4(keccak256(\"royaltyInfo(uint256,uint256)\")) == 0x2a55205a\n    /// bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;\n    /// _registerInterface(_INTERFACE_ID_ERC2981);\n\n    // /// @notice Called with the sale price to determine how much royalty\n    // //          is owed and to whom.\n    // /// @param _tokenId - the NFT asset queried for royalty information\n    // /// @param _salePrice - the sale price of the NFT asset specified by _tokenId\n    // /// @return receiver - address of who should be sent the royalty payment\n    // /// @return royaltyAmount - the royalty payment amount for _salePrice\n\n    function royaltyInfo(uint256 _tokenId, uint256 _salePrice)\n        external\n        view\n        returns (address receiver, uint256 royaltyAmount);\n}\n",
-  "sourcePath": "/home/senyou/freecodecamp/NOAP-Project/truffle/contracts/IERC2981.sol",
+  "sourcePath": "/home/senyou/freecodecamp/PBC/NOAP/contracts/IERC2981.sol",
   "ast": {
     "absolutePath": "project:/contracts/IERC2981.sol",
     "exportedSymbols": {
       "IERC165": [
-        3968
+        4031
       ],
       "IERC2981": [
-        86
+        83
       ]
     },
-    "id": 87,
+    "id": 84,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "absolutePath": "project:/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
         "file": "../node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol",
-        "id": 69,
+        "id": 66,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 87,
-        "sourceUnit": 3969,
+        "scope": 84,
+        "sourceUnit": 4032,
         "src": "32:81:1",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
-        "id": 70,
+        "id": 67,
         "literals": [
           "solidity",
           ">=",
@@ -105,16 +105,16 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 72,
+              "id": 69,
               "name": "IERC165",
               "nameLocations": [
                 "227:7:1"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 3968,
+              "referencedDeclaration": 4031,
               "src": "227:7:1"
             },
-            "id": 73,
+            "id": 70,
             "nodeType": "InheritanceSpecifier",
             "src": "227:7:1"
           }
@@ -123,16 +123,16 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "documentation": {
-          "id": 71,
+          "id": 68,
           "nodeType": "StructuredDocumentation",
           "src": "149:56:1",
           "text": "\n @dev Interface for the NFT Royalty Standard"
         },
         "fullyImplemented": false,
-        "id": 86,
+        "id": 83,
         "linearizedBaseContracts": [
-          86,
-          3968
+          83,
+          4031
         ],
         "name": "IERC2981",
         "nameLocation": "215:8:1",
@@ -140,13 +140,13 @@
         "nodes": [
           {
             "documentation": {
-              "id": 74,
+              "id": 71,
               "nodeType": "StructuredDocumentation",
               "src": "241:302:1",
               "text": "ERC165 bytes to add to interface array - set in parent contract\n implementing this standard\n bytes4(keccak256(\"royaltyInfo(uint256,uint256)\")) == 0x2a55205a\n bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;\n _registerInterface(_INTERFACE_ID_ERC2981);"
             },
             "functionSelector": "2a55205a",
-            "id": 85,
+            "id": 82,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -154,17 +154,17 @@
             "nameLocation": "991:11:1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 79,
+              "id": 76,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 76,
+                  "id": 73,
                   "mutability": "mutable",
                   "name": "_tokenId",
                   "nameLocation": "1011:8:1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 85,
+                  "scope": 82,
                   "src": "1003:16:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -173,7 +173,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 75,
+                    "id": 72,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1003:7:1",
@@ -186,12 +186,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 78,
+                  "id": 75,
                   "mutability": "mutable",
                   "name": "_salePrice",
                   "nameLocation": "1029:10:1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 85,
+                  "scope": 82,
                   "src": "1021:18:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -200,7 +200,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 77,
+                    "id": 74,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1021:7:1",
@@ -215,17 +215,17 @@
               "src": "1002:38:1"
             },
             "returnParameters": {
-              "id": 84,
+              "id": 81,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 81,
+                  "id": 78,
                   "mutability": "mutable",
                   "name": "receiver",
                   "nameLocation": "1096:8:1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 85,
+                  "scope": 82,
                   "src": "1088:16:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -234,7 +234,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 80,
+                    "id": 77,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1088:7:1",
@@ -248,12 +248,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 83,
+                  "id": 80,
                   "mutability": "mutable",
                   "name": "royaltyAmount",
                   "nameLocation": "1114:13:1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 85,
+                  "scope": 82,
                   "src": "1106:21:1",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -262,7 +262,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 82,
+                    "id": 79,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "1106:7:1",
@@ -276,14 +276,14 @@
               ],
               "src": "1087:41:1"
             },
-            "scope": 86,
+            "scope": 83,
             "src": "982:147:1",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 87,
+        "scope": 84,
         "src": "205:926:1",
         "usedErrors": []
       }
@@ -296,7 +296,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.9",
-  "updatedAt": "2022-08-31T22:13:19.781Z",
+  "updatedAt": "2022-09-17T15:48:04.539Z",
   "devdoc": {
     "details": "Interface for the NFT Royalty Standard",
     "kind": "dev",

@@ -22,9 +22,10 @@ function EventCard({event}) {
   const [date,setDate] = useState('')
   const [description,setDescription] = useState('')
   const [name,setName] = useState('')
+  // const [image, setImage] = useState("../../images/poap22.jpg");
 
   const sendEventID = (id) => {
-    navigate(`/events/${id}`, {eventId:id});
+    navigate(`/events/${id}`);
   }
 
   useEffect(() => {
@@ -34,6 +35,18 @@ function EventCard({event}) {
         .getEventDescription(event)
         .call();
       const name = await contract?.contract?.methods.getEventName(event).call();
+      const tokenURI = await contract?.contract?.methods
+        .getEventTokenURI(event)
+        .call();
+      // const response = await fetch(tokenURI);
+
+      // if (!response.ok) throw new Error(response.statusText);
+
+      // const json = await response.json();
+      // if(json.image) {
+      //   setImage(json.image)
+      // }
+      // console.log(json.image)
       setName(name);
       setDescription(description);
       setDate(date);
@@ -44,22 +57,29 @@ function EventCard({event}) {
 
   
   return (
-    <motion.div className="eventCard"
-    variants={eventCardVariant}
-    initial="hidden"
-    animate="visible">
+    <motion.div
+      className="eventCard"
+      variants={eventCardVariant}
+      initial="hidden"
+      animate="visible"
+    >
       <div className="date">
         <p>{date}</p>
         {/* <div className="lineDecocation"></div> */}
       </div>
-      <div className="eventDescription">{description?.substring(0,80)+"..."}
+      <div className="eventDescription">
+        {description?.substring(0, 80) + "..."}
       </div>
       <div className="eventImageName">
-        <div className="eventImage"></div>
-        <Link to={`/events/${event}`} state={{eventId: event}} style={{textDecoration:'none'}}>
-          <div className="eventName">
-            {name}
-          </div>
+        <div
+          className="eventImage"
+        ></div>
+        <Link
+          to={`/events/${event}`}
+          state={{ eventId: event }}
+          style={{ textDecoration: "none" }}
+        >
+          <div className="eventName">{name}</div>
         </Link>
       </div>
     </motion.div>

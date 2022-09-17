@@ -1,16 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Form,Row } from "react-bootstrap";
+import { Form, Row } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 import { useWeb3React } from "@web3-react/core";
 import NOAP from "../../contracts/NOAP.json";
-import {useNavigate} from 'react-router'
+import { useNavigate } from "react-router";
 import { useContract } from "../../hooks/useContract";
 import "./CreateEventForm.css";
-import {
-  CountryDropdown,
-  RegionDropdown,
-} from "react-country-region-selector";
+import axios from "axios";
+import { CountryDropdown, RegionDropdown } from "react-country-region-selector";
 import {
   NotificationContainer,
   NotificationManager,
@@ -20,88 +18,171 @@ import "react-notifications/lib/notifications.css";
 const GAS_AMOUNT = 3000000;
 
 function CreateEventForm() {
-  const { account } =
-    useWeb3React();
+  const { account } = useWeb3React();
   let [loading, setLoading] = useState(false);
- 
-  const [name,setName] = useState("")
-  const [description,setDescription] = useState("")
-  const [email,setEmail] = useState("")
-  const [date,setDate] = useState("")
-  const [jsonFile,setJsonFile] = useState("")
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [email, setEmail] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [enddate, setEndDate] = useState("");
   const [url, setUrl] = useState("");
-  const [country,setCountry] = useState("")
-  const [city,setCity] = useState("")
-  const [online,setOnline] = useState(false)
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [online, setOnline] = useState(false);
+  const [fileImg, setFileImg] = useState(null);
+  const [tokenSupply, setTokenSupply] = useState(1);
 
   const contract = useContract(NOAP);
-  const navigate = useNavigate()
- 
+  const navigate = useNavigate();
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //      const data =  await uploadFile();
+  //       if(data === true) {
+  //         setLoading(true);
+  //         try {
+  //           const eventId = await contract.contract.methods
+  //             .createEvent(
+  //               url,
+  //               description,
+  //               name,
+  //               country,
+  //               city,
+  //               online,
+  //               date,
+  //               email
+  //             )
+  //             .send({ from: account, gas: GAS_AMOUNT });
+  //         return navigate("/events");
+
+  //         } catch(err) {
+  //           console.log(err)
+  //           NotificationManager.warning(
+  //             "Semething went wrong",
+  //           );
+  //         }
+
+  //         setLoading(false)
+  //       }
+
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    
-    
-       const data =  await uploadFile();
-        if(data === true) {
-          setLoading(true);
-          try {
-            const eventId = await contract.contract.methods
-              .createEvent(
-                url,
-                description,
-                name,
-                country,
-                city,
-                online,
-                date,
-                email
-              )
-              .send({ from: account, gas: GAS_AMOUNT });
-          return navigate("/events");
+    setLoading(true);
+    try {
+      await sendFileToIPFS();
+      console.log("url",url)
+      const tokenURI = await uploadJson();
+      console.log("tokenURI",tokenURI)
+      const eventId = await contract?.contract?.methods
+        ?.createEvent(
+          tokenURI,
+          description,
+          name,
+          country,
+          city,
+          online,
+          startDate,
+          enddate,
+          email,
+          tokenSupply
+        )
+        .send({ from: account, gas: GAS_AMOUNT });
+      console.log("eventId", eventId);
+      return navigate("/events");
+    } catch (err) {
+      console.log(err);
+      NotificationManager.warning("Something went wrong");
+    }
 
-          } catch(err) {
-            console.log(err)
-            NotificationManager.warning(
-              "Semething went wrong",
-            );
-          }
-
-          setLoading(false)
-        }
-   
-    
+    setLoading(false);
   };
 
-
-  const uploadFile =async () => {
-    
-      const data = new FormData();
-      data.append("file", jsonFile);
-      data.append("upload_preset", "noapweb3");
-      data.append("cloud_name", "noap");
-      const resp = await fetch(
-        " https://api.cloudinary.com/v1_1/noap/auto/upload",
-        {
-          method: "post",
-          mode: "cors",
-          body: data,
-        }
+  const uploadJson = async () => {
+    //error handling
+    if (url.trim() == "" || name.trim() == "" || description.trim() == "") {
+      NotificationManager.warning(
+        "❗Please make sure all fields are completed before creating the event."
       );
-      if(resp.status === 400) {
-        NotificationManager.warning("Semething went wrong");
-        return false;
-      } else {
-        let json = await resp.json();
-        setUrl(json.url)
-        NotificationManager.success("File well deployed");
-        return true;
-      }
-    
+      return;
+    } //make metadata
+    const metadata = new Object();
+    metadata.name = name;
+    metadata.image = url;
+    metadata.description = description;
+
+    //make pinata call
+    const pinataResponse = await pinJSONToIPFS(metadata);
+    if (!pinataResponse.success) {
+      NotificationManager.warning(
+        "😢 Something went wrong while uploading your tokenURI."
+      );
+      return;
     }
-   
+    const tokenURI = pinataResponse.pinataUrl;
+    console.log(tokenURI);
+    return tokenURI;
+  };
 
+  const pinJSONToIPFS = async (jsonBody) => {
+    const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+    //making axios POST request to Pinata ⬇️
+    return axios
+      .post(url, jsonBody, {
+        headers: {
+          pinata_api_key: process.env.pinata_api_key,
+          pinata_secret_api_key: process.env.pinata_secret_api_key,
+        },
+      })
+      .then(function (response) {
+        return {
+          success: true,
+          pinataUrl:
+            "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash,
+        };
+      })
+      .catch(function (error) {
+        console.log(error);
+        return {
+          success: false,
+          message: error.message,
+        };
+      });
+  };
 
+  const sendFileToIPFS = async () => {
+    if (fileImg) {
+      try {
+        const formData = new FormData();
+        formData.append("file", fileImg);
+
+        const resFile = await axios({
+          method: "post",
+          url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          data: formData,
+          headers: {
+            pinata_api_key: process.env.pinata_api_key,
+            pinata_secret_api_key: process.env.pinata_secret_api_key,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        const ImgHash = `ipfs://${resFile.data.IpfsHash}`;
+        setUrl(`https://ipfs.io/ipfs/${resFile.data.IpfsHash}`);
+        console.log(ImgHash);
+        //Take a look at your Pinata Pinned section, you will see a new file added to you list.
+      } catch (error) {
+        NotificationManager.warning("Error sending File to IPFS: ");
+        console.log("Error sending File to IPFS: ");
+        console.log(error);
+      }
+    } else {
+      NotificationManager.error("Please choose a file");
+    }
+  };
 
   return (
     <div>
@@ -154,19 +235,33 @@ function CreateEventForm() {
         </div>
 
         <div className="formItems">
-          <Form.Group className="mb-3 rightItem" controlId="date">
-            <Form.Label className="formLable">Date</Form.Label>
+          <Form.Group className="mb-3 rightItem" controlId="startdate">
+            <Form.Label className="formLable">Start Date</Form.Label>
             <Form.Control
-              name="date"
+              name="startdate"
               required
               type="date"
               placeholder="DD/MM/YYYY"
               className="formBox"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
             />
           </Form.Group>
-          <Form.Group className="mb-3 leftItem" controlId="name">
+          <Form.Group className="mb-3 leftItem" controlId="enddate">
+            <Form.Label className="formLable">End date</Form.Label>
+            <Form.Control
+              name="enddate"
+              required
+              type="date"
+              placeholder="DD/MM/YYYY"
+              className="formBox"
+              value={enddate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </Form.Group>
+        </div>
+        <div className="formItems">
+          <Form.Group className="mb-3 rightItem" controlId="name">
             <Form.Label className="formLable">Event Name</Form.Label>
             <Form.Control
               name="eventName"
@@ -178,26 +273,40 @@ function CreateEventForm() {
               onChange={(e) => setName(e.target.value)}
             />
           </Form.Group>
+          <Form.Group controlId="formFile" className="mb-3  leftItem">
+            <Form.Label>NOAP Artwork</Form.Label>
+            <Form.Control
+              name="artwork"
+              type="file"
+              accept="application/jpeg application/png application/jpg"
+              className="formBox"
+              value={""}
+              onChange={(e) => setFileImg(e.target.files[0])}
+            />
+          </Form.Group>
         </div>
-
-        <Form.Group controlId="formFile" className="mb-3 formFile">
-          <Form.Label>NOAP Artwork</Form.Label>
-          <Form.Control
-            name="jsonFile"
-            type="file"
-            accept="application/json"
-            className="formBox"
-            value={""}
-            onChange={(e) => setJsonFile(e.target.files[0])}
-          />
-        </Form.Group>
-        <Form.Check
-          type="switch"
-          id="custom-switch"
-          label="Online Event"
-          value={online}
-          onChange={(e) => setOnline(e.target.checked)}
-        />
+        <div className="formItems">
+          <Form.Group controlId="supply" className="mb-3  rightItem">
+            <Form.Label>Total NOAPS To Mint</Form.Label>
+            <Form.Control
+              name="supply"
+              type="number"
+              className="formBox"
+              value={tokenSupply}
+              onChange={(e) => setTokenSupply(e.target.value)}
+            />
+          </Form.Group>
+          <Form.Group controlId="supply" className="mb-3  leftItem">
+            <Form.Label></Form.Label>
+            <Form.Check
+              type="switch"
+              id="custom-switch"
+              label="Online Event"
+              value={online}
+              onChange={(e) => setOnline(e.target.checked)}
+            />
+          </Form.Group>
+        </div>
       </Form>
       <Button onClick={handleSubmit} className="submit" disabled={loading}>
         {loading ? "Creating..." : "Create event"}
