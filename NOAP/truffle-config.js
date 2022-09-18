@@ -1,4 +1,4 @@
-const HDWalletProvider = require('@truffle/hdwallet-provider');
+var HDWalletProvider = require("truffle-hdwallet-provider");
 require('dotenv').config();
 
 module.exports = {
@@ -11,10 +11,10 @@ module.exports = {
     rinkeby: {
       networkCheckTimeout: 1000000,
       provider: function () {
-        return new HDWalletProvider(process.env.MNEMONIC, "https://rinkeby.infura.io/v3/3760dd3a73834a399e69a9c451e9aa18");
+        return new HDWalletProvider(process.env.mnemonic, "https://rinkeby.infura.io/v3/3760dd3a73834a399e69a9c451e9aa18");
       },
       network_id: 4,
-      gas: 29970676,
+      gas: 29970592,
       gasPrice: 10000000000,
     }
   },
