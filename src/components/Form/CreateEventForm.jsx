@@ -26,7 +26,6 @@ function CreateEventForm() {
   const [email, setEmail] = useState("");
   const [startDate, setStartDate] = useState("");
   const [enddate, setEndDate] = useState("");
-  const [url, setUrl] = useState("");
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [online, setOnline] = useState(false);
@@ -72,11 +71,13 @@ function CreateEventForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    //some validation
+    //process of uploading the image and the metadata
     try {
-      await sendFileToIPFS();
+      const url = await sendFileToIPFS();
       console.log("url",url)
-      const tokenURI = await uploadJson();
-      console.log("tokenURI",tokenURI)
+      const tokenURI = await uploadJson(url);
+      console.log(tokenURI)
       const eventId = await contract?.contract?.methods
         ?.createEvent(
           tokenURI,
@@ -101,14 +102,9 @@ function CreateEventForm() {
     setLoading(false);
   };
 
-  const uploadJson = async () => {
-    //error handling
-    if (url.trim() == "" || name.trim() == "" || description.trim() == "") {
-      NotificationManager.warning(
-        "❗Please make sure all fields are completed before creating the event."
-      );
-      return;
-    } //make metadata
+  const uploadJson = async (url) => {
+ 
+   //make metadata
     const metadata = new Object();
     metadata.name = name;
     metadata.image = url;
@@ -128,23 +124,24 @@ function CreateEventForm() {
   };
 
   const pinJSONToIPFS = async (jsonBody) => {
+    
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
     //making axios POST request to Pinata ⬇️
     return axios
       .post(url, jsonBody, {
         headers: {
-          pinata_api_key: process.env.pinata_api_key,
-          pinata_secret_api_key: process.env.pinata_secret_api_key,
+          pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
+          pinata_secret_api_key: process.env.REACT_APP_PINATA_API_SECRET,
         },
       })
-      .then(function (response) {
+      .then(function(response) {
         return {
           success: true,
           pinataUrl:
             "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash,
         };
       })
-      .catch(function (error) {
+      .catch(function(error) {
         console.log(error);
         return {
           success: false,
@@ -164,15 +161,14 @@ function CreateEventForm() {
           url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
           data: formData,
           headers: {
-            pinata_api_key: process.env.pinata_api_key,
-            pinata_secret_api_key: process.env.pinata_secret_api_key,
+            pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
+            pinata_secret_api_key: process.env.REACT_APP_PINATA_API_SECRET,
             "Content-Type": "multipart/form-data",
           },
         });
 
-        const ImgHash = `ipfs://${resFile.data.IpfsHash}`;
-        setUrl(`https://ipfs.io/ipfs/${resFile.data.IpfsHash}`);
-        console.log(ImgHash);
+       const url = `https://ipfs.io/ipfs/${resFile.data.IpfsHash}`;
+        return url
         //Take a look at your Pinata Pinned section, you will see a new file added to you list.
       } catch (error) {
         NotificationManager.warning("Error sending File to IPFS: ");

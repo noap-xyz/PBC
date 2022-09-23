@@ -19,7 +19,7 @@ function SearchBar() {
           type="search"
           class="form-control form-control searchInput"
           id="floatingInput"
-          placeholder="Search For Events by creator's address"
+          placeholder="Search by creator's address or by Event's name"
         />
         <button class="btn btn-primary searchButton" type="submit">
           Search{" "}

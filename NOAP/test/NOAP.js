@@ -44,17 +44,19 @@ contract('NOAP', (accounts) => {
    
 
     it('creates an event', async () => {
-        const event =  await NOAPContract.connect(minterA).createEvent(tokenURINewEvent,"desc","name","morocco","meknes",true,"22/12/2022","24/12/2022","younesmeskafe@gmail.com",10);
-        console.log(event)
+        await NOAPContract.connect(minterA).createEvent(tokenURINewEvent,"desc","name","morocco","meknes",true,"22/12/2022","24/12/2022","younesmeskafe@gmail.com",10);
     });
 
     it('creates a request', async () => {
         //uint256 eventID,address attender,string date)
-         await NOAPContract.connect(minterA).createRequest("0",recipientA.address,"22/2942./424");
-        const id =  await NOAPContract.getEventRequestIDs("0");
+        await NOAPContract.connect(minterA).createRequest("0",recipientA.address,"22/2942./424");
+        await NOAPContract.getEventRequestIDs("0");
     });
 
- 
+    it('Check if we can get the country of the event by the name',async() => {
+        const id = await NOAPContract.getEventCountryByName("name");
+        await expect(id).to.be.equal(1)
+    })
 
 
     it('prevents unauthorized minters from minting', async () => {

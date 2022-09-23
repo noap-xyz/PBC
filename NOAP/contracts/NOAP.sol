@@ -48,6 +48,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
 
     mapping(uint256 => Req) requests;
     mapping(uint256 => Evt) evts;
+    mapping(string => uint256) events;
     mapping(uint256 => uint256) private tokenToEventID;
     mapping(bytes32 => uint256) private hashToEventID;
     uint256 private tokenIDCounter;
@@ -255,6 +256,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         evts[eventID].creatorEmail = creatorEmail;
         evts[eventID].online = online;
         evts[eventID].limitSupply = limitSupply;
+        events[name] = eventID;
 
         // Map the event hash back to the Event
         hashToEventID[eventHash] = eventID;
@@ -305,6 +307,9 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
 
     function getEventName(uint256 eventID) public view returns (string memory) {
         return evts[eventID].name;
+    }
+    function getEventIdByName(string memory name) public view returns (uint256) {
+        return events[name];
     }
 
     function getEventCountry(uint256 eventID) public view returns (string memory) {
