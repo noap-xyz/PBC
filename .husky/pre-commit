@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npm run lint
-cd ./NOAP && npm run test && npm run prettier:solidity && npm run lint && cd ..
+
+cd ./NOAP && npm run test && npm run lint && cd ..
