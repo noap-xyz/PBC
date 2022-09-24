@@ -379,6 +379,18 @@ button {
 
 /* end Requests */
 
+/* Wallet informations page */
+
+.walletInformationsMain {
+  background: url('./images/background1.webp');
+  height: 100vh;
+  padding: 50px 100px;
+  color: #1F054E;
+  overflow-x: hidden;
+}
+
+/* End Wallet informations page */
+
 /* FAQ page */
 
 /* .headText {
