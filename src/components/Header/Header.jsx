@@ -55,6 +55,12 @@ function Header() {
               </Nav.Link>
             </LinkContainer>
 
+            <LinkContainer to="/WalletInformations">
+              <Nav.Link className="d-flex align-items-center navBarLinks">
+                <span>Wallet Informations</span>
+              </Nav.Link>
+            </LinkContainer>
+            
             <LinkContainer to="/faq">
               <Nav.Link className="d-flex align-items-center navBarLinks">
                 <span>FAQ</span>
