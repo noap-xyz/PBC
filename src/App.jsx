@@ -14,6 +14,8 @@ import Web3 from "web3";
 import "./index.css";
 import Faq from "./pages/Faq";
 
+
+
 function App() {
   function getLibrary(provider) {
     return new Web3(provider);

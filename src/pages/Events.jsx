@@ -26,12 +26,21 @@ function Events() {
       setLoading(true);
       if (searchParams.get("address")) {
         try {
-          const ids = await contract?.contract?.methods
-            .getUserEventIDs(searchParams.get("address"))
-            .call();
-          setEventsIDS(ids);
+          //handle the search by creator's address or by event's name
+          if(searchParams.get("address").startsWith("0x")) {
+            const ids = await contract?.contract?.methods
+              .getUserEventIDs(searchParams.get("address"))
+              .call();
+              setEventsIDS(ids);
+          } else {
+             const ids = await contract?.contract?.methods
+               .getEventIdByName(searchParams.get("address"))
+               .call();
+             setEventsIDS(Array.from(ids));
+          }
+          
         } catch (err) {
-          NotificationManager.error("Something went wrong");
+          NotificationManager.error("No results found");
         }
       }
       setLoading(false);
