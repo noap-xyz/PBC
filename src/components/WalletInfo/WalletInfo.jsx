@@ -49,7 +49,7 @@ function WalletInfo() {
 
 
 function useBalance(){
-  const {account, library} =  useWeb3React();
+  const {account} =  useWeb3React();
   const [balance, setBalance] = useState();
 
   var Eth = require('web3-eth');
@@ -65,7 +65,7 @@ function useBalance(){
       web3.eth.getBalance(account).then(val => setBalance(val));
       
     }
-  }, [account, library]);
+  }, [account]);
 
   return balance ? `${formatEther(balance)} ETH` : null;
 }
