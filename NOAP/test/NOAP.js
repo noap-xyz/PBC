@@ -54,9 +54,11 @@ contract('NOAP', (accounts) => {
     });
 
     it('Check if we can get the country of the event by the name',async() => {
-        const id = await NOAPContract.getEventCountryByName("name");
-        await expect(id).to.be.equal(1)
+        const id = await NOAPContract.getEventIdByName("name");
+        expect(id).to.be.equal(1)
     })
+
+  
 
 
     it('prevents unauthorized minters from minting', async () => {

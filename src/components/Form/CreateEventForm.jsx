@@ -35,38 +35,7 @@ function CreateEventForm() {
   const contract = useContract(NOAP);
   const navigate = useNavigate();
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
 
-  //      const data =  await uploadFile();
-  //       if(data === true) {
-  //         setLoading(true);
-  //         try {
-  //           const eventId = await contract.contract.methods
-  //             .createEvent(
-  //               url,
-  //               description,
-  //               name,
-  //               country,
-  //               city,
-  //               online,
-  //               date,
-  //               email
-  //             )
-  //             .send({ from: account, gas: GAS_AMOUNT });
-  //         return navigate("/events");
-
-  //         } catch(err) {
-  //           console.log(err)
-  //           NotificationManager.warning(
-  //             "Semething went wrong",
-  //           );
-  //         }
-
-  //         setLoading(false)
-  //       }
-
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,9 +44,7 @@ function CreateEventForm() {
     //process of uploading the image and the metadata
     try {
       const url = await sendFileToIPFS();
-      console.log("url",url)
       const tokenURI = await uploadJson(url);
-      console.log(tokenURI)
       const eventId = await contract?.contract?.methods
         ?.createEvent(
           tokenURI,
@@ -92,7 +59,6 @@ function CreateEventForm() {
           tokenSupply
         )
         .send({ from: account, gas: GAS_AMOUNT });
-      console.log("eventId", eventId);
       return navigate("/events");
     } catch (err) {
       console.log(err);
@@ -119,13 +85,12 @@ function CreateEventForm() {
       return;
     }
     const tokenURI = pinataResponse.pinataUrl;
-    console.log(tokenURI);
     return tokenURI;
   };
 
   const pinJSONToIPFS = async (jsonBody) => {
     
-    const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+    const url = process.env.REACT_APP_URL_JSON;
     //making axios POST request to Pinata ⬇️
     return axios
       .post(url, jsonBody, {
@@ -158,7 +123,7 @@ function CreateEventForm() {
 
         const resFile = await axios({
           method: "post",
-          url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          url: process.env.REACT_APP_URL_FILE,
           data: formData,
           headers: {
             pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,

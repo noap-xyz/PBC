@@ -60,6 +60,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
 
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
+
+    function getTime() public view virtual returns(uint256) {
+        return block.timestamp;
+    }
+
     // override supportsInterface
     function supportsInterface(bytes4 interfaceId)
         public
@@ -308,6 +313,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     function getEventName(uint256 eventID) public view returns (string memory) {
         return evts[eventID].name;
     }
+
     function getEventIdByName(string memory name) public view returns (uint256) {
         return events[name];
     }
