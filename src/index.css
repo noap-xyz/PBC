@@ -18,7 +18,7 @@ body {
   min-height: 100vh;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
-  background: white!important;
+  background: white !important;
   font-family: "Poppins", sans-serif !important;
 }
 
@@ -39,15 +39,15 @@ button {
 /* Home Screen */
 
 /* White Background Section */
-.whiteSection{
+.whiteSection {
   height: 50vh;
 }
 
-.leftSection{
+.leftSection {
   width: 40vw;
 }
 
-.quote{
+.quote {
   font-weight: 700;
   font-size: 15px;
   text-transform: uppercase;
@@ -55,7 +55,7 @@ button {
   margin-bottom: 0px;
 }
 
-.homePageHeader{
+.homePageHeader {
   font-weight: 700;
   font-size: 40px;
   line-height: 60px;
@@ -63,7 +63,7 @@ button {
   color: #1F054E;
 }
 
-.createEventBtn{
+.createEventBtn {
   background: #927FF2;
   box-shadow: 0.936979px 0.936979px 1.87396px rgba(0, 0, 0, 0.25);
   border: #927FF2;
@@ -75,7 +75,7 @@ button {
   padding: 4px 14px;
 }
 
-.createEventBtn:hover{
+.createEventBtn:hover {
   box-shadow: 0px 8px 24px rgba(53, 22, 117, 0.12);
   padding: 8px 24px;
   font-size: 18px;
@@ -83,7 +83,7 @@ button {
 
 /* Poap Decoration Section */
 
-.rightSection{
+.rightSection {
   width: 60vw;
   height: 442px;
   background: url(./images/poapDecoration.png);
@@ -96,12 +96,12 @@ button {
 
 /* Image background section */
 
-.bottomSection{
+.bottomSection {
   background: url(./images/background1.webp);
   height: 50vh;
 }
 
-.bottomLeftSection{
+.bottomLeftSection {
   background: url(./images/buttomLeftSectionIllustrations1.png);
   background-repeat: no-repeat;
   width: 50vw;
@@ -110,18 +110,19 @@ button {
   align-items: center;
 }
 
-.bottomRightSection{
+.bottomRightSection {
   width: 50vw;
 }
 
-.bottomRightSection h3{
+.bottomRightSection h3 {
   font-style: normal;
   font-weight: 700;
   font-size: 25px;
   line-height: 38px;
   color: #927FF2;
 }
-.bottomRightSection p{
+
+.bottomRightSection p {
   font-style: normal;
   font-weight: 500;
   font-size: 17px;
@@ -171,12 +172,12 @@ button {
 
 /*event details page*/
 
-.eventPage{
+.eventPage {
   padding: 30px 0;
-  align-items:center;
+  align-items: center;
 }
 
-.eventPageTitle{
+.eventPageTitle {
   width: 100%;
   height: 112px;
   background: rgba(146, 127, 242, 0.4);
@@ -186,18 +187,18 @@ button {
   margin-bottom: 100px;
 }
 
-.eventName{
-  font-weight: 700!important;
-  font-size: 29px!important;
-  line-height: 31px!important;
-  text-transform: capitalize!important;
-  color: #FFFFFF!important;
+.eventName {
+  font-weight: 700 !important;
+  font-size: 29px !important;
+  line-height: 31px !important;
+  text-transform: capitalize !important;
+  color: #FFFFFF !important;
 }
 
 /* .eventPageTitleFlex{
 } */
 
-.eventPageImage{
+.eventPageImage {
   width: 142px;
   height: 142px;
   background: url('./images/poap44.jpg');
@@ -206,14 +207,14 @@ button {
   margin-right: 10px;
 }
 
-.eventName{
+.eventName {
   font-weight: 700;
   font-size: 29px;
   line-height: 31px;
   color: #FFFFFF;
 }
 
-.eventPageDate p{
+.eventPageDate p {
   font-weight: 500;
   font-size: 23px;
   line-height: 34px;
@@ -221,7 +222,7 @@ button {
   color: rgba(53, 22, 117, 0.5);
 }
 
-.eventPageDescription{
+.eventPageDescription {
   font-weight: 500;
   font-size: 18px;
   line-height: 27px;
@@ -229,7 +230,7 @@ button {
   color: #1F054E;
 }
 
-.bottomSectionEvent{
+.bottomSectionEvent {
   display: flex;
   align-items: end;
   justify-content: space-between;
@@ -242,7 +243,7 @@ button {
   border-radius: 31px;
 }
 
-.additionalInfo{
+.additionalInfo {
   width: 271px;
   height: 195px;
   background: #FFFFFF;
@@ -251,7 +252,7 @@ button {
   padding: 20px;
 }
 
-.additionalInfoTitle{
+.additionalInfoTitle {
   font-weight: 500;
   font-size: 18px;
   line-height: 27px;
@@ -260,7 +261,9 @@ button {
   color: #927FF2;
 }
 
-.location, .country, .city{
+.location,
+.country,
+.city {
   font-weight: 500;
   font-size: 18px;
   line-height: 27px;
@@ -297,7 +300,7 @@ button {
   overflow-y: hidden;
 }
 
-.requestsPageTitle{
+.requestsPageTitle {
   font-weight: 700;
   font-size: 40px;
   line-height: 53px;
@@ -307,7 +310,8 @@ button {
 
 .requests {
   background: #FFFFFF;
-  box-shadow: 0.936979px 0.936979px 1.87396px rgba(0, 0, 0, 0.25);  border-radius: 20px;
+  box-shadow: 0.936979px 0.936979px 1.87396px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
   width: 100%;
   overflow: hidden;
 }
@@ -334,12 +338,12 @@ button {
   margin-right: 10px;
 }
 
-.ImageAndName{
+.ImageAndName {
   display: flex;
   align-items: center;
 }
 
-.eventRequestsName{
+.eventRequestsName {
   font-weight: 700;
   font-size: 19px;
   line-height: 20px;
@@ -347,7 +351,7 @@ button {
   color: #927FF2;
 }
 
-.mintAllButton{
+.mintAllButton {
   width: 138px;
   height: 39px;
   left: 930px;
@@ -363,7 +367,7 @@ button {
   color: #927FF2;
 }
 
-.endEventButton{
+.endEventButton {
   background: #927FF2;
   box-shadow: 0.936979px 0.936979px 1.87396px rgba(0, 0, 0, 0.25);
   border-radius: 31px;
@@ -397,14 +401,12 @@ button {
   display: flex;
   align-items: flex-end;
 }
-
 .text {
   font-weight: 700;
   font-size: 40px;
   line-height: 53px;
   text-transform: capitalize;
 }
-
 .image {
   background: url("./images/emojione-monotone_fire.png");
   width: 45px;
@@ -412,23 +414,23 @@ button {
   margin: 0 -100px 17px;
 } */
 
-.faqMain{
+.faqMain {
   background: url(./images/background1.webp);
   height: 100vh;
   padding-top: 50px;
 }
 
-.questionMark{
+.questionMark {
   font-weight: 800;
   font-size: 40px;
   color: #927FF2;
   position: relative;
-  left:-120px;
+  left: -120px;
   top: -2px;
 }
 
-.faqItemsBackground{
-  background: rgba(241,206,255, 0.4);
+.faqItemsBackground {
+  background: rgba(241, 206, 255, 0.4);
   border: #927FF2;
 }
 
@@ -653,8 +655,62 @@ button {
     height: 150px;
   }
 
- }
+}
 
 
 
 /* end not found screen */
+
+
+/*share modal*/
+.social-icon:hover {
+  opacity: 0.9 !important;
+  transition: all .3s ease-in-out;
+}
+
+.input_group {
+  width: 100%;
+  height: 50px;
+  border-radius: 10px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 8px;
+}
+
+.input_group i {
+  font-size: 30px;
+  color: rgb(157, 165, 178);
+
+}
+
+.input_group input {
+  width: 65%;
+  height: 40px;
+  border: 1px solid #f5f5f5;
+  outline: none;
+  color: rgb(157, 165, 178);
+  font-size: 17px;
+
+}
+
+.input_group button {
+  width: 100px;
+  height: 41px;
+  border-radius: 6px;
+  color: white;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+
+.copy {
+  background-color: rgb(77, 144, 253);
+}
+
+.copied {
+  background-color: rgb(39, 196, 82);
+}
