@@ -18,7 +18,7 @@ body {
   min-height: 100vh;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
-  background: white !important;
+  background: white;
   font-family: "Poppins", sans-serif !important;
 }
 
@@ -714,3 +714,5 @@ button {
 .copied {
   background-color: rgb(39, 196, 82);
 }
+/* end not found screen */
+
