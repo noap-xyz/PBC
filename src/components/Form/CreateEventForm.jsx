@@ -14,11 +14,14 @@ import {
   NotificationManager,
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
+import ShareModal from "../modals/ShareModal";
 
 const GAS_AMOUNT = 3000000;
 
 function CreateEventForm() {
   const { account } = useWeb3React();
+
+  const [url, setURl] = useState("");
   let [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
@@ -35,7 +38,14 @@ function CreateEventForm() {
   const contract = useContract(NOAP);
   const navigate = useNavigate();
 
+  //modal part
+  const [show, setShow] = useState(false);
 
+  const handleClose = () => {
+    setShow(false);
+    return navigate(`/${url}`);
+  };
+  const handleShow = () => setShow(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +55,8 @@ function CreateEventForm() {
     try {
       const url = await sendFileToIPFS();
       const tokenURI = await uploadJson(url);
-      const eventId = await contract?.contract?.methods
+
+      await contract?.contract?.methods
         ?.createEvent(
           tokenURI,
           description,
@@ -59,7 +70,17 @@ function CreateEventForm() {
           tokenSupply
         )
         .send({ from: account, gas: GAS_AMOUNT });
-      return navigate("/events");
+      const eventId = await contract?.contract?.methods.getLastEventID().call();
+      setURl(`events/${eventId}`);
+      handleShow(true);
+      setName("");
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+      setCity("");
+      setCountry("");
+      setFileImg(null);
+      setTokenSupply(1);
     } catch (err) {
       console.log(err);
       NotificationManager.warning("Something went wrong");
@@ -69,8 +90,7 @@ function CreateEventForm() {
   };
 
   const uploadJson = async (url) => {
- 
-   //make metadata
+    //make metadata
     const metadata = new Object();
     metadata.name = name;
     metadata.image = url;
@@ -89,7 +109,6 @@ function CreateEventForm() {
   };
 
   const pinJSONToIPFS = async (jsonBody) => {
-    
     const url = process.env.REACT_APP_URL_JSON;
     //making axios POST request to Pinata ⬇️
     return axios
@@ -132,8 +151,8 @@ function CreateEventForm() {
           },
         });
 
-       const url = `https://ipfs.io/ipfs/${resFile.data.IpfsHash}`;
-        return url
+        const url = `https://ipfs.io/ipfs/${resFile.data.IpfsHash}`;
+        return url;
         //Take a look at your Pinata Pinned section, you will see a new file added to you list.
       } catch (error) {
         NotificationManager.warning("Error sending File to IPFS: ");
@@ -148,6 +167,7 @@ function CreateEventForm() {
   return (
     <div>
       <NotificationContainer />
+      <ShareModal url={url} show={show} handleClose={handleClose} />
       <Form>
         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
           <Form.Label className="formLable">Event Description</Form.Label>
@@ -215,6 +235,8 @@ function CreateEventForm() {
               required
               type="date"
               placeholder="DD/MM/YYYY"
+              disabled={startDate === ""}
+              min={startDate}
               className="formBox"
               value={enddate}
               onChange={(e) => setEndDate(e.target.value)}
@@ -235,13 +257,12 @@ function CreateEventForm() {
             />
           </Form.Group>
           <Form.Group controlId="formFile" className="mb-3  leftItem">
-            <Form.Label>NOAP Artwork</Form.Label>
+            <Form.Label>NOAP Image</Form.Label>
             <Form.Control
               name="artwork"
               type="file"
               accept="application/jpeg application/png application/jpg"
-              className="formBox"
-              value={""}
+              className="formBox hidden"
               onChange={(e) => setFileImg(e.target.files[0])}
             />
           </Form.Group>
