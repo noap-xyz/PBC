@@ -6,6 +6,8 @@ import "../node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../node_modules/@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 import "../node_modules/@openzeppelin/contracts/utils/Context.sol";
+import "../node_modules/@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "../node_modules/@openzeppelin/contracts/metatx/MinimalForwarder.sol";
 
 import "./IERC2981.sol";
 import "./BaseRelayRecipient.sol";
@@ -19,6 +21,8 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
 
     string private constant ERROR_INVALID_INPUTS = "Each field must have the same number of values";
 
+    
+
     struct Evt {
         bool ended;
         address royalty;
@@ -28,13 +32,15 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         string country;
         string city;
         bool online;
-        string startdate;
-        string endDate;
+        uint256 startdate;
+        uint256 endDate;
         uint256 limitSupply;
         string creatorEmail;
         EnumerableSet.UintSet tokens;
         EnumerableSet.AddressSet minters;
+        uint256 timestamp;
     }
+   
 
     struct Req {
         uint256 eventID;
@@ -60,6 +66,13 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
 
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
+
+    
+
+     modifier timeStampReached(uint256 eventId){
+      require(evts[eventId].startdate <= block.timestamp && evts[eventId].endDate >= block.timestamp, "you should interact with the event in the range decided by the creator");
+      _;
+    }
 
     function getTime() public view virtual returns(uint256) {
         return block.timestamp;
@@ -92,7 +105,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         uint256 eventID,
         address recipient,
         uint256 requestID
-    ) external {
+    ) external timeStampReached(eventID) {
         requests[requestID].minted = true;
         Evt storage evt = evts[eventID];
         require(
@@ -117,7 +130,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         uint256 eventID,
         bytes[] memory recipients,
         uint256[] memory requestIds
-    ) external {
+    ) external timeStampReached(eventID) {
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
         _checkSenderIsMinter(evt);
@@ -148,8 +161,8 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         string memory country,
         string memory city,
         bool online,
-        string memory startdate,
-        string memory enddate,
+        uint256 startdate,
+        uint256 enddate,
         string memory creatorEmail,
         uint256 limitSupply
     ) external returns (uint256) {
@@ -192,7 +205,7 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         uint256 eventID,
         address attender,
         string memory date
-    ) external {
+    ) external timeStampReached(eventID) {
         Evt storage evt = evts[eventID];
         require(!evt.ended, "Event Ended");
         uint256 requestID = ++requestIDCounter;
@@ -243,8 +256,8 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         string memory country,
         string memory city,
         bool online,
-        string memory startdate,
-        string memory enddate,
+        uint256  startdate,
+        uint256  enddate,
         string memory creatorEmail,
         uint256 limitSupply
     ) internal returns (uint256) {
@@ -334,8 +347,11 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         return evts[eventID].minters.at(index);
     }
 
-    function getEventDate(uint256 eventID) public view returns (string memory) {
+    function getEventEndDate(uint256 eventID) public view returns (uint256) {
         return evts[eventID].endDate;
+    }
+    function getEventStartDate(uint256 eventID) public view returns (uint256) {
+        return evts[eventID].startdate;
     }
 
     function getEventIsOnline(uint256 eventID) public view returns (bool) {
@@ -387,6 +403,8 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
     function getLastTokenID() public view returns (uint256) {
         return tokenIDCounter;
     }
+
+    
 
     function getLastEventID() public view returns (uint256) {
         return eventIDCounter;
@@ -455,6 +473,8 @@ contract NOAP is Context, ERC165Storage, ERC721Burnable, BaseRelayRecipient, IER
         _checkSenderIsMinter(evt);
         evt.royalty = receiver;
     }
+
+    
 
     /* -- END ERC2981 methods */
 

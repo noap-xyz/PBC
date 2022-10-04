@@ -12,13 +12,15 @@ import {
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 
+
 const GAS_AMOUNT = 3000000;
 
 function EventPage() {
   const { account } = useWeb3React();
   const params = useParams();
   const contract = useContract(NOAP);
-  const [date, setDate] = useState();
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
   const [description, setDescription] = useState();
   const [name, setName] = useState();
   const [online, setOnline] = useState(false);
@@ -33,9 +35,12 @@ function EventPage() {
     const getDatas = async () => {
       setLoading(true);
       try {
-        const date = await contract?.contract?.methods
-          .getEventDate(params.id)
-          .call();
+        const startDate = new Date(await contract?.contract?.methods
+          .getEventStartDate(params.id)
+          .call() * 1000).toLocaleDateString()
+          const endDate = new Date(await contract?.contract?.methods
+            .getEventEndDate(params.id)
+            .call() * 1000).toLocaleDateString()
         const description = await contract?.contract?.methods
           .getEventDescription(params.id)
           .call();
@@ -59,14 +64,16 @@ function EventPage() {
             .call();
 
           console.log("tokens", ids);
+         
+         
         setEnded(ended);
         setName(name);
         setDescription(description);
-        setDate(date);
+        setStartDate(startDate);
+        setEndDate(endDate)
         setOnline(online);
         setCity(city);
         setCountry(country);
-        setDate(date);
       } catch (err) {
         console.log(err);
       }
@@ -120,7 +127,11 @@ function EventPage() {
           </div>
           <Container>
             <div className="eventPageDate">
-              <p>{date}</p>
+              <p>Start Date:{startDate}</p>
+              {/* <div className="lineDecocation"></div> */}
+            </div>
+            <div className="eventPageDate">
+              <p>End Date:{endDate}</p>
               {/* <div className="lineDecocation"></div> */}
             </div>
 
