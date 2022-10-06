@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Form, Row } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { Button } from "react-bootstrap";
 import { useWeb3React } from "@web3-react/core";
 import NOAP from "../../contracts/NOAP.json";
@@ -15,28 +15,39 @@ import {
 } from "react-notifications";
 import "react-notifications/lib/notifications.css";
 import ShareModal from "../modals/ShareModal";
+import { useForm } from "react-hook-form";
 
 const GAS_AMOUNT = 3000000;
 
 function CreateEventForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+  } = useForm();
+
   const { account } = useWeb3React();
 
   const [url, setURl] = useState("");
   let [loading, setLoading] = useState(false);
+  const [startDate,setStartDate] = useState("")
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [email, setEmail] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [enddate, setEndDate] = useState("");
+  
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
-  const [online, setOnline] = useState(false);
   const [fileImg, setFileImg] = useState(null);
-  const [tokenSupply, setTokenSupply] = useState(1);
 
   const contract = useContract(NOAP);
   const navigate = useNavigate();
+
+  function toTimestamp(strDate) {
+    var datum = Date.parse(strDate);
+    return datum / 1000;
+  }
+
+  
+  
 
   //modal part
   const [show, setShow] = useState(false);
@@ -45,12 +56,14 @@ function CreateEventForm() {
     setShow(false);
     return navigate(`/${url}`);
   };
+
   const handleShow = () => setShow(true);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    //some validation
+  const onSubmit = async (data) => {
+    //some validation by react useForm hook
+     setLoading(true);
+    
+    
     //process of uploading the image and the metadata
     try {
       const url = await sendFileToIPFS();
@@ -59,28 +72,23 @@ function CreateEventForm() {
       await contract?.contract?.methods
         ?.createEvent(
           tokenURI,
-          description,
-          name,
+          getValues("description"),
+          getValues("name"),
           country,
           city,
-          online,
-          startDate,
-          enddate,
-          email,
-          tokenSupply
+          getValues("online"),
+          toTimestamp(getValues("startDate")),
+          toTimestamp(getValues("endDate")),
+          getValues("email"),
+          getValues("supply")
         )
         .send({ from: account, gas: GAS_AMOUNT });
       const eventId = await contract?.contract?.methods.getLastEventID().call();
       setURl(`events/${eventId}`);
       handleShow(true);
-      setName("");
-      setDescription("");
-      setStartDate("");
-      setEndDate("");
       setCity("");
       setCountry("");
       setFileImg(null);
-      setTokenSupply(1);
     } catch (err) {
       console.log(err);
       NotificationManager.warning("Something went wrong");
@@ -92,9 +100,9 @@ function CreateEventForm() {
   const uploadJson = async (url) => {
     //make metadata
     const metadata = new Object();
-    metadata.name = name;
+    metadata.name = getValues("name");
     metadata.image = url;
-    metadata.description = description;
+    metadata.description = getValues("description");
 
     //make pinata call
     const pinataResponse = await pinJSONToIPFS(metadata);
@@ -168,94 +176,131 @@ function CreateEventForm() {
     <div>
       <NotificationContainer />
       <ShareModal url={url} show={show} handleClose={handleClose} />
-      <Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
           <Form.Label className="formLable">Event Description</Form.Label>
           <Form.Control
             name="description"
-            required
             as="textarea"
             rows={3}
             placeholder="Give a clear description about your NOAP event. This description will be published with your event for collectors and issuers to see."
             className="formBox"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            {...register("description", { required: true, minLength: 30 })}
           />
         </Form.Group>
-
+        {errors.description && (
+          <p className="error">
+            The minimum length of your description is 30 characters
+          </p>
+        )}
         <div className="formItems">
-          <Form.Group className="mb-3 rightItem" controlId="email">
-            <Form.Label className="formLable">Email</Form.Label>
-            <Form.Control
-              name="email"
-              required
-              type="email"
-              placeholder="name@example.com"
-              className="formBox"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3 leftItem " controlId="location">
-            <Form.Label className="formLable">Location</Form.Label>
-            <div className="d-flex">
-              <CountryDropdown
-                className="location-input"
-                value={country}
-                onChange={(val) => setCountry(val)}
-                style={{ marginRight: "10px" }}
+          <div className="item d-flex flex-column rightItem">
+            <Form.Group
+              className="mb-3 "
+              controlId="email"
+              style={{ width: "100%" }}
+            >
+              <Form.Label className="formLable">Email</Form.Label>
+              <Form.Control
+                name="email"
+                type="email"
+                placeholder="name@example.com"
+                className="formBox"
+                {...register("email", {
+                  required: true,
+                  pattern: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                })}
               />
-              <RegionDropdown
-                className="location-input"
-                country={country}
-                value={city}
-                onChange={(e) => setCity(e)}
-              />
+            </Form.Group>
+            <div className="">
+              {errors.email && <p className="error">Please check the Email</p>}
             </div>
-          </Form.Group>
+          </div>
+
+          <div className="item d-flex flex-column leftItem">
+            <Form.Group className="mb-3 " controlId="location">
+              <Form.Label className="formLable">Location</Form.Label>
+              <div className="d-flex">
+                <CountryDropdown
+                  className="location-input"
+                  value={country}
+                  onChange={(val) => setCountry(val)}
+                  required
+                  style={{ marginRight: "10px" }}
+                />
+                <RegionDropdown
+                  className="location-input"
+                  country={country}
+                  value={city}
+                  required
+                  onChange={(e) => setCity(e)}
+                />
+              </div>
+            </Form.Group>
+          </div>
         </div>
 
         <div className="formItems">
-          <Form.Group className="mb-3 rightItem" controlId="startdate">
-            <Form.Label className="formLable">Start Date</Form.Label>
-            <Form.Control
-              name="startdate"
-              required
-              type="date"
-              placeholder="DD/MM/YYYY"
-              className="formBox"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3 leftItem" controlId="enddate">
-            <Form.Label className="formLable">End date</Form.Label>
-            <Form.Control
-              name="enddate"
-              required
-              type="date"
-              placeholder="DD/MM/YYYY"
-              disabled={startDate === ""}
-              min={startDate}
-              className="formBox"
-              value={enddate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </Form.Group>
+          <div className="item d-flex flex-column rightItem">
+            <Form.Group className="mb-3" controlId="startdate">
+              <Form.Label className="formLable">Start Date</Form.Label>
+              <Form.Control
+                name="startdate"
+                type="date"
+                placeholder="DD/MM/YYYY"
+                className="formBox"
+                {...register("startDate", { required: true })}
+                onChange={e=>setStartDate(e.target.value)}
+              />
+            </Form.Group>
+            <div className="">
+              {errors.startDate && (
+                <p className="error">This field is required</p>
+              )}
+            </div>
+          </div>
+
+          <div className="item d-flex flex-column leftItem">
+            <Form.Group className="mb-3 " controlId="enddate">
+              <Form.Label className="formLable">End date</Form.Label>
+              <Form.Control
+                name="enddate"
+                type="date"
+                placeholder="DD/MM/YYYY"
+                disabled={startDate===""}
+                min={startDate}
+                className="formBox"
+                {...register("endDate", { required: true })}
+              />
+            </Form.Group>
+            <div className="">
+              {errors.endDate && (
+                <p className="error">This field is required</p>
+              )}
+            </div>
+          </div>
         </div>
         <div className="formItems">
-          <Form.Group className="mb-3 rightItem" controlId="name">
-            <Form.Label className="formLable">Event Name</Form.Label>
-            <Form.Control
-              name="eventName"
-              required
-              type=""
-              placeholder="enter the name of your NOAP event"
-              className="formBox"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
+          <div className="item d-flex flex-column rightItem">
+            <Form.Group className="mb-3" controlId="name">
+              <Form.Label className="formLable">Event Name</Form.Label>
+              <Form.Control
+                name="eventName"
+                type=""
+                placeholder="enter the name of your NOAP event"
+                className="formBox"
+                {...register("name", { required: true, maxLength: 30 })}
+              />
+            </Form.Group>
+            {errors.name && (
+              <div className="">
+                <p className="error">
+                  The maximum length of the event's name is 30 characters
+                </p>
+              </div>
+            )}
+          </div>
+
           <Form.Group controlId="formFile" className="mb-3  leftItem">
             <Form.Label>NOAP Image</Form.Label>
             <Form.Control
@@ -268,31 +313,47 @@ function CreateEventForm() {
           </Form.Group>
         </div>
         <div className="formItems">
-          <Form.Group controlId="supply" className="mb-3  rightItem">
-            <Form.Label>Total NOAPS To Mint</Form.Label>
-            <Form.Control
-              name="supply"
-              type="number"
-              className="formBox"
-              value={tokenSupply}
-              onChange={(e) => setTokenSupply(e.target.value)}
-            />
-          </Form.Group>
-          <Form.Group controlId="supply" className="mb-3  leftItem">
-            <Form.Label></Form.Label>
-            <Form.Check
-              type="switch"
-              id="custom-switch"
-              label="Online Event"
-              value={online}
-              onChange={(e) => setOnline(e.target.checked)}
-            />
-          </Form.Group>
+          <div className="item d-flex flex-column rightItem">
+            <Form.Group controlId="supply" className="mb-3 ">
+              <Form.Label>Total NOAPS To Mint</Form.Label>
+              <Form.Control
+                name="supply"
+                type="number"
+                className="formBox"
+                {...register("supply", {
+                  valueAsNumber: true,
+                  validate: (value) => value > 0,
+                })}
+              />
+            </Form.Group>
+            <div className="">
+              {errors.supply && (
+                <p className="error">The minimum number of noaps supply is 1</p>
+              )}
+            </div>
+          </div>
+          <div className="item d-flex flex-column leftItem">
+            <Form.Group controlId="online" className="mb-3">
+              <Form.Label></Form.Label>
+              <Form.Check
+                type="switch"
+                id="custom-switch"
+                label="Online Event"
+                {...register("online")}
+              />
+            </Form.Group>
+            <div className="">
+              {errors.online && <p className="error">This is required</p>}
+            </div>
+          </div>
         </div>
+        {/* <Button className="submit" disabled={loading}>
+          {loading ? "Creating..." : "Create event"}
+        </Button> */}
+        <Button type="submit" className="submit" disabled={loading}>
+          {loading ? "Creating..." : "Create event"}
+        </Button>
       </Form>
-      <Button onClick={handleSubmit} className="submit" disabled={loading}>
-        {loading ? "Creating..." : "Create event"}
-      </Button>
     </div>
   );
 }

@@ -71,3 +71,9 @@ div.formItems {
     box-shadow: 0.936979px 0.936979px 1.87396px rgb(0 0 0 / 25%);
     border-radius: 13.4756px;
 }
+
+
+
+.error { 
+  color:#FF9494!important;
+}
