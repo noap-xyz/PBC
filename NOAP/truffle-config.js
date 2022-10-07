@@ -16,6 +16,15 @@ module.exports = {
       network_id: 4,
       gas: 29970592,
       gasPrice: 10000000000,
+    },
+    goerli: {
+      networkCheckTimeout: 1000000,
+      provider: function () {
+        return new HDWalletProvider(process.env.mnemonic, `https://goerli.infura.io/v3/${process.env.goerli_key}`);
+      },
+      network_id: 5,
+      gas: 29970592,
+      gasPrice: 10000000000,
     }
   },
 

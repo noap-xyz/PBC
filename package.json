@@ -2,9 +2,11 @@
   "name": "frontend",
   "description": "The Notarized Attendance Protocole, is a way for event organizers to notarize participation and issue digital badges or receipts (NOAPs) to the event attendees.",
   "version": "0.1.0",
-  "private": false,
-  "author": "",
+  "private": true,
+ "homepage": "https://noap.xyz",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",

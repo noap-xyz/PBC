@@ -36,16 +36,11 @@ function Header() {
   }
 
   return (
-
     <Navbar expand="lg">
       <Container>
-          
-        <LinkContainer to="/" className='PageName'>
-            <Navbar.Brand >
-              NOAPsEvents
-            </Navbar.Brand>
+        <LinkContainer to="/" className="PageName">
+          <Navbar.Brand>NOAPsEvents</Navbar.Brand>
         </LinkContainer>
-
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -61,7 +56,7 @@ function Header() {
                 <span>Events</span>
               </Nav.Link>
             </LinkContainer>
-            
+
             <LinkContainer to="/faq">
               <Nav.Link className="d-flex align-items-center navBarLinks">
                 <span>FAQ</span>
@@ -73,17 +68,25 @@ function Header() {
               <div className="walletInfoBox">
                 <div className="accountIcon"></div>
                 <p className="account">
-                  {displayAccount}
+                  {window.ethereum
+                    ? active
+                      ? displayAccount
+                      : "Not connected"
+                    : "no wallet"}
                 </p>
               </div>
               <div className="walletInfoBox">
                 <div className="balanceIcon"></div>
                 <p className="accountBalanceNetworkTitle">
-                  {chainId === 1 ? "Mainnet" : "Testnet"}
+                  {window.ethereum
+                    ? active
+                      ? chainId === 1
+                        ? "Mainnet"
+                        : "Testnet"
+                      : "Not connected"
+                    : "no wallet"}
                 </p>
-                <p className="">
-                  {balance}
-                </p>
+                <p className="">{balance}</p>
               </div>
               <Button onClick={handleNavigation} className="create-btn">
                 Create Event
@@ -115,7 +118,7 @@ function useBalance(){
     }
   }, [account]);
 
-  return balance ? `${formatEther(balance)} ETH` : null;
+  return balance ? `${formatEther(balance).substring(0,16)} ETH` : null;
 }
 
 export default Header;
