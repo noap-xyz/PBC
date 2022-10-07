@@ -4,20 +4,21 @@
 
 .create-btn {
     border-radius:5px;
-    background: #FFFFFF;
-    border: #FFFFFF;
+    background: #927FF2;
+    border: #927FF2;
     font-weight: 700;
     font-size: 18px;
     line-height: 28px;
-    color: #927FF2;
+    color: #FFFFFF;
     box-shadow: 0.936979px 0.936979px 1.87396px rgba(0, 0, 0, 0.25);
     border-radius: 30px;
+    padding:5px 15px;
 }
 
 .create-btn:hover {
-    background: #8b75f7;
-        border: #927FF2;
-        color: #FFFFFF;
+    background: #FFFFFF;
+        border: #FFFFFF;
+        color: #927FF2;
 }
 
 .PageName{
@@ -37,4 +38,35 @@
 
 .navBarLinks span{
     padding-right: 40px;
+}
+
+.walletInfoBox{
+    border: 1px solid #5240AD;
+    border-radius: 22px;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    margin-right: 10px;
+}
+
+.walletInfoBox p{
+    margin-bottom: 0;
+    padding: 0 5px;
+}
+
+.accountBalanceNetworkTitle{
+    color: #5240AD;
+
+}
+
+.accountIcon{
+    width: 24px;
+    height: 24px;
+    background: url(../../images/account.png);
+}
+
+.balanceIcon{
+    width: 25.38px;
+    height: 24px;
+    background: url(../../images/balance.png);
 }

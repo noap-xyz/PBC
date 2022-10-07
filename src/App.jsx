@@ -6,7 +6,6 @@ import Events from "./pages/Events";
 import EventPage from "./pages/EventPage";
 import RequestsPage from "./pages/RequestsPage";
 import HomeScreen from "./pages/HomeScreen";
-import WalletInformations from "./pages/WalletInformations";
 import NotFoundScreen from "./pages/NotFoundScreen";
 import { Web3ReactProvider } from "@web3-react/core";
 import { injected } from "./components/Connectors";
@@ -33,7 +32,6 @@ function App() {
             <Route path="/faq" element={<Faq />} />
             <Route path="/Requests/:id" element={<RequestsPage />} />
             <Route path="/Events/:id" element={<EventPage />} />
-            <Route path="/WalletInformations" element={<WalletInformations />} />
             <Route path="*" element={<NotFoundScreen />} />
           </Routes>
         </div>
