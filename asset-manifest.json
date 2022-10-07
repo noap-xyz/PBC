@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.48943773.css",
-    "main.js": "/static/js/main.252c9083.js",
+    "main.js": "/static/js/main.7674c8d1.js",
     "static/media/poapDecoration.png": "/static/media/poapDecoration.3dc5adeb9036f8c70413.png",
     "static/media/background1.webp": "/static/media/background1.fb9a7da3caca22a00581.webp",
     "static/media/buttomLeftSectionIllustrations1.png": "/static/media/buttomLeftSectionIllustrations1.78f759a8a28c7537455d.png",
@@ -11,10 +11,10 @@
     "static/media/notification.ttf?s3g3t9": "/static/media/notification.c5d9251ea82e42f75381.ttf",
     "index.html": "/index.html",
     "main.48943773.css.map": "/static/css/main.48943773.css.map",
-    "main.252c9083.js.map": "/static/js/main.252c9083.js.map"
+    "main.7674c8d1.js.map": "/static/js/main.7674c8d1.js.map"
   },
   "entrypoints": [
     "static/css/main.48943773.css",
-    "static/js/main.252c9083.js"
+    "static/js/main.7674c8d1.js"
   ]
 }
