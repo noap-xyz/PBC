@@ -45,7 +45,7 @@ contract('NOAP', (accounts) => {
 
     it('creates an event', async () => {
         await NOAPContract.connect(minterA).createEvent(tokenURINewEvent,"desc","name","morocco","meknes",true,"22/12/2022","24/12/2022","younesmeskafe@gmail.com",10);
-    });
+     });
 
     it('creates a request', async () => {
         //uint256 eventID,address attender,string date)
